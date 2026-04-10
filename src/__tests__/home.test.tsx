@@ -61,10 +61,7 @@ describe("Home page", () => {
   it("renders Start Meeting Now button", () => {
     const btn = screen.getByText("Start Meeting Now");
     expect(btn).toBeInTheDocument();
-    expect(btn.closest("a")).toHaveAttribute(
-      "href",
-      "https://meet.google.com/new"
-    );
+    expect(btn.closest("a")).toHaveAttribute("href", "/meeting");
   });
 
   it("renders Radar section with items", () => {

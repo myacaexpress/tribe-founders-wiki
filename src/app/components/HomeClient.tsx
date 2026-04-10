@@ -80,14 +80,12 @@ export default function HomeClient({
         </div>
 
         {/* Start Meeting Now button */}
-        <a
-          href="https://meet.google.com/new"
-          target="_blank"
-          rel="noopener noreferrer"
+        <Link
+          href="/meeting"
           className="block w-full mb-4 btn-primary text-center"
         >
           Start Meeting Now
-        </a>
+        </Link>
 
         {/* Radar card */}
         <div className="card mb-4">
