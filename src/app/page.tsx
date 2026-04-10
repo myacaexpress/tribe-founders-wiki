@@ -58,7 +58,7 @@ export default function Home() {
         </div>
 
         {/* State sentence card */}
-        <div className="card mb-6 bg-gradient-to-br from-[#ffffff] to-[#faf7f2]">
+        <div className="card mb-4 bg-gradient-to-br from-[#ffffff] to-[#faf7f2]">
           <p className="text-[#1a1a1a] font-serif text-lg leading-relaxed">
             {businessStateSentence}
           </p>
@@ -69,13 +69,13 @@ export default function Home() {
           href="https://meet.google.com/new"
           target="_blank"
           rel="noopener noreferrer"
-          className="block w-full mb-6 btn-primary text-center"
+          className="block w-full mb-4 btn-primary text-center"
         >
           Start Meeting Now
         </a>
 
         {/* Radar card */}
-        <div className="card mb-6">
+        <div className="card mb-4">
           <h2 className="serif-heading text-lg mb-4 text-[#1a1a1a]">Radar</h2>
           <div className="space-y-3">
             {radarItems.map((item) => (
@@ -109,7 +109,7 @@ export default function Home() {
         </div>
 
         {/* Group Table card */}
-        <div className="card mb-6">
+        <div className="card mb-4">
           <h2 className="serif-heading text-lg mb-4 text-[#1a1a1a]">
             Group Table
           </h2>
@@ -141,7 +141,7 @@ export default function Home() {
         </div>
 
         {/* Lanes card */}
-        <div className="card mb-6">
+        <div className="card mb-4">
           <h2 className="serif-heading text-lg mb-4 text-[#1a1a1a]">Lanes</h2>
           <div className="space-y-4">
             {/* Shawn - Teal */}
@@ -192,7 +192,7 @@ export default function Home() {
         </div>
 
         {/* Tasks card */}
-        <div className="card mb-6">
+        <div className="card mb-4">
           <h2 className="serif-heading text-lg mb-4 text-[#1a1a1a]">Tasks</h2>
           <div className="mb-4 flex gap-2 border-b border-[#eae4da]">
             <button
@@ -240,7 +240,7 @@ export default function Home() {
         </div>
 
         {/* Tools card */}
-        <div className="card mb-6">
+        <div className="card mb-4">
           <h2 className="serif-heading text-lg mb-4 text-[#1a1a1a]">Tools</h2>
           <div className="grid grid-cols-3 gap-3">
             {toolItems.map((tool) => (
@@ -263,7 +263,7 @@ export default function Home() {
         {/* Open Full Wiki link */}
         <Link
           href="/wiki"
-          className="block w-full text-center py-3 px-4 border-2 border-dashed border-[#eae4da] rounded-lg text-[#2b8a88] font-medium hover:border-[#2b8a88] hover:bg-[#f0f8f7] transition-colors mb-6"
+          className="block w-full text-center py-3 px-4 border-2 border-dashed border-[#eae4da] rounded-lg text-[#2b8a88] font-medium hover:border-[#2b8a88] hover:bg-[#f0f8f7] transition-colors mb-4"
         >
           Open Full Wiki
         </Link>

@@ -36,7 +36,7 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-[#faf7f2] flex items-center justify-center p-4">
-      <div className="w-full max-w-sm">
+      <div className="w-full max-w-[440px]">
         {/* Logo */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold font-serif">
@@ -47,7 +47,7 @@ export default function LoginPage() {
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6 px-4">
           <div>
             <label
               htmlFor="password"
@@ -76,7 +76,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full btn-primary"
+            className="w-full btn-primary text-center"
           >
             {loading ? "Entering..." : "Enter"}
           </button>
