@@ -2,147 +2,129 @@
   "master": {
     "tasks": [
       {
-        "id": 35,
-        "title": "Implement Password Gate with Next.js Middleware",
-        "description": "Create single shared password protection covering all routes using Next.js middleware and session cookies",
-        "details": "Use Next.js 14+ middleware.ts to intercept all routes except /api/auth. Create /api/auth POST endpoint validating against process.env.APP_PASSWORD. Set httpOnly, secure cookie with maxAge=30 days, sameSite='strict'. Render centered branded password form component with auto-focus input, shake animation on wrong password. Founder picker modal after first auth storing selection in separate cookie.",
-        "testStrategy": "Test middleware blocks unauth routes, /api/auth sets cookie on correct password, rejects wrong password, cookie persists 30 days, founder picker stores correctly, mobile responsive form works on iPhone",
+        "id": 46,
+        "title": "Stand up self-hosted Cap instance",
+        "description": "Deploy CapSoftware/Cap on Hetzner CX22 or Oracle ARM using docker compose, configure videos.tribebenefits.com DNS, install Cap Desktop on founders' machines and connect to server",
+        "details": "git clone https://github.com/CapSoftware/Cap; cd Cap; docker compose up -d; Configure nginx reverse proxy with SSL via certbot; Update DNS A record for videos.tribebenefits.com to server IP; Download Cap Desktop v2.15+ for macOS/Windows; Test connection by starting a 30s recording",
+        "testStrategy": "Verify Cap web UI accessible at https://videos.tribebenefits.com; Confirm Desktop app connects and records/uploads 30s test video; Check video appears in Cap dashboard with playback",
         "priority": "high",
         "dependencies": [],
         "status": "pending",
         "subtasks": []
       },
       {
-        "id": 36,
-        "title": "Setup Next.js Project with Tailwind CSS and TriBe Brand Tokens",
-        "description": "Initialize Next.js 14+ App Router project with Tailwind CSS configured with TriBe brand colors and typography",
-        "details": "npx create-next-app@latest with app router, typescript, tailwind. Configure tailwind.config.js with custom colors: background:#faf7f2, card:#ffffff, border:#eae4da, text:#1a1a1a, muted:#8a8580, teal:#2b8a88, coral:#e85d4e, sage:#a8b5a0, amber:#e8a33d. Set fonts: Georgia for display, system-ui for UI. Max-width 440px container. Mobile-first responsive design.",
-        "testStrategy": "Verify Tailwind compiles with custom tokens, brand colors render correctly across components, Georgia headlines display on wiki pages, mobile viewport constraints work, no bundle size issues",
-        "priority": "high",
-        "dependencies": [],
-        "status": "pending",
-        "subtasks": []
-      },
-      {
-        "id": 37,
-        "title": "Build Home Screen with Card Layout and Founder Colors",
-        "description": "Create mobile-first home screen with vertically stacked cards using TriBe brand system and founder color borders",
-        "details": "Fixed order: header(logo+subtitle), state sentence(editable MD), meeting button(teal gradient), radar card, group table card, lanes card(3 equal founder blocks with color borders), tasks card(tabs), tools grid(2x3), wiki link, this week, FAB(coral fixed bottom). Cards: white bg, #eae4da border, 16px radius/padding. Use CSS grid/flexbox, max-width 440px centered.",
-        "testStrategy": "Verify card order fixed, founder lanes equal size with correct color borders(teal/shawn,coral/mark,sage/michael), FAB fixed bottom-center thumb-reachable, responsive stacks correctly on iPhone",
+        "id": 47,
+        "title": "Implement Cap webhook to GitHub transcript pipeline",
+        "description": "Route Cap's Whisper transcripts via webhook to commit raw/transcripts/YYYY-MM-DD-title.md files to GitHub repo",
+        "details": "Cap auto-generates transcripts on upload; Add webhook endpoint in Cap config to POST to Node.js/Flask receiver; Receiver parses JSON with transcript text/timestamps; Format as markdown with speaker labels; Use GitHub API with PAT to commit to main branch in raw/transcripts/; Handle filename sanitization and dedup by meeting ID",
+        "testStrategy": "Record 5min meeting on Cap Desktop; Verify webhook fires and .md file appears in repo within 2min; Validate transcript accuracy >90% WER against audio; Check git history shows clean commit",
         "priority": "high",
         "dependencies": [
-          35,
-          36
+          46
         ],
         "status": "pending",
         "subtasks": []
       },
       {
-        "id": 38,
-        "title": "Implement Wiki Page Renderer with TOC and Keyword Search",
-        "description": "Create Wikipedia-style markdown renderer for wiki/ files with auto TOC, keyword search, and section link cards",
-        "details": "Use Next.js [...path] catch-all route reading .md files via GitHub Contents API. remark/rehype pipeline for MD→HTML. Extract H2/H3 for TOC with anchor links. Keyword search indexes all wiki/ files on mount, filters by string match showing dropdown with snippets. Georgia serif headlines, system-ui body. Colored bullets(teal/active,amber/decision,coral/idea,gray/archived). At-a-glance box, update footer.",
-        "testStrategy": "Test renders any wiki/[path].md, TOC jumps correctly, search finds across files with context, colored bullets match categories, no raw MD syntax visible, <1s render time",
+        "id": 48,
+        "title": "Build meeting processor Claude agent",
+        "description": "Create agent that reads new raw transcripts and outputs structured JSON: tasks/decisions/ideas/open-questions with owner/source/timestamp/confidence; writes to wiki/meetings/YYYY-MM-DD-proposed.md",
+        "details": "Use Claude 3.5 Sonnet API; Prompt template: 'Extract from transcript: [{type: \"task\"|\"decision\"|\"idea\"|\"question\", owner: string|null, quote: string, timestamp: MM:SS, confidence: \"high\"|\"medium\"|\"low\"}]'; Git clone anthropic-sdk; Poll raw/transcripts/ every 5min via cron; Match filename to generate proposed.md; Commit via GitHub API",
+        "testStrategy": "Process 3 real meeting transcripts; Manual review JSON extraction accuracy >80%; Verify confidence markers correct (explicit=high, inferred=medium); Check proposed.md renders correctly in markdown viewer",
         "priority": "high",
         "dependencies": [
-          36
+          47
         ],
         "status": "pending",
         "subtasks": []
       },
       {
-        "id": 39,
-        "title": "Develop Add Something Bottom Sheet with File Write",
-        "description": "Build quick-capture bottom sheet routing to lane/brainstorm folders via GitHub API writes",
-        "details": "FAB triggers fixed bottom sheet(translateY animation, backdrop). Grabber handle, large textarea(auto-grow), 3 buttons(Lane teal default, Brainstorm coral, Watch Email disabled+Phase2 badge). Save generates YYYY-MM-DD-HH-mm-slug.md (slug=first5words kebab), writes to founders/[founder]/lane|brainstorm/ via GitHub Contents API. Confirmation toast shows destination/path.",
-        "testStrategy": "Test sheet animation smooth 300ms, writes correct filename/path per founder selection, disabled Watch button shows Phase2 badge, toast confirms exact file created, mobile thumb-friendly",
+        "id": 49,
+        "title": "Wire up post-meeting review screen",
+        "description": "Implement tribe-meeting-confirm.html from Phase 1 mockup: read proposed.md, display items with quotes, add Confirm/Edit/Skip/Confirm-All buttons that commit to wiki",
+        "details": "Use vanilla JS + GitHub API; Fetch proposed.md via raw.githubusercontent.com; Parse frontmatter JSON + markdown quotes; UI: collapsible sections per item type; Actions: PATCH proposed.md status or create new files (tasks.md, decisions/YYYY-MM-DD.md, ideas/); Confirm-All bulk commits all high-confidence items",
+        "testStrategy": "Load real proposed.md; Test all actions: verify GitHub commits created/updated files; Confirm-All processes 10+ items in <5s; Edge case: empty proposed.md shows 'Nothing to review'",
         "priority": "high",
         "dependencies": [
-          35,
-          37
+          48
         ],
         "status": "pending",
         "subtasks": []
       },
       {
-        "id": 40,
-        "title": "Implement GitHub Contents API Integration for Read/Write",
-        "description": "Create API routes for reading/writing markdown files from private GitHub repo using PAT",
-        "details": "Next.js API routes: GET /api/repo/[...path] reads file tree/content via GitHub Contents API (base64 decode MD). POST /api/repo/[path] creates/updates files (base64 encode). Use process.env.GITHUB_PAT (fine-grained repo scope). Cache reads with revalidatePath for ISR. Handle directory listing for wiki navigation. Error handling for 404/private repo.",
-        "testStrategy": "Test reads all wiki/ files correctly decoded, writes new files with correct structure/timestamps, directory listing works, ISR revalidates on write, PAT permissions sufficient",
-        "priority": "high",
-        "dependencies": [
-          36
-        ],
-        "status": "pending",
-        "subtasks": []
-      },
-      {
-        "id": 41,
-        "title": "Build Group Table with Status Lifecycle and Decision Records",
-        "description": "Create decision tracking system with status machine and auto decision record generation",
-        "details": "Parse wiki/group-table.md YAML frontmatter array: {id,raised_by,raised_at,title,reason,questions[],prep[],status,resolution{}}. Status cycle buttons(raised→discussed→decided→executing→complete). Resolution modal captures decision text/via/source/decided_at. On resolve: create wiki/decisions/YYYY-MM-DD-slug.md template. Prep items inject to Tasks card(dotted circle,gray text).",
-        "testStrategy": "Test status advances correctly, resolution creates decision file with template, prep renders differently in Tasks, lifecycle forward-only, unanimous rule messaging",
+        "id": 50,
+        "title": "Build pre-meeting brief generator",
+        "description": "Scheduled job runs 1hr before 'founders sync' calendar events; pulls brainstorms/lane/radar/parks/group-table; writes wiki/meetings/YYYY-MM-DD-briefing.md",
+        "details": "Use Google Calendar API (founders' calendars); Cron job every 15min checks next 2hrs for tagged events; Claude agent prompt synthesizes: 'Recent open items + context for [event]'; Git commit briefing.md with sections: Open Tasks/Decisions/Stale Items/Context; Link to sources",
+        "testStrategy": "Create test calendar event; Verify briefing.md generated 1hr prior; Manual check content pulls from 5+ wiki sources accurately; Test with no events shows empty state",
         "priority": "medium",
         "dependencies": [
-          38,
-          40
+          49
         ],
         "status": "pending",
         "subtasks": []
       },
       {
-        "id": 42,
-        "title": "Implement Radar Card with Urgency Zones and Conditional Render",
-        "description": "Build early-warning radar parsing wiki/radar.md with zone thresholds and empty-state hiding",
-        "details": "Parse wiki/radar.md structured items{zone,title,description,date,source}. Sort red→yellow→sage. Render only populated zones(RED dot+header,etc). Empty=all zones empty→return null (no card). Zone colors match thresholds from CLAUDE.md. Each item: color dot+bold title+meta+source link.",
-        "testStrategy": "Test parses radar.md correctly, sorts by zone urgency, empty state hides card completely, populated zones show headers/dots, mobile row layout clean",
+        "id": 51,
+        "title": "Implement watcher system runner",
+        "description": "Runner reads watchers/ directory files, parses schedule/Gmail query, executes per-founder agents to update target lane pages with confidence/source links",
+        "details": "Node.js cron runner: glob('watchers/*.md'); Parse YAML frontmatter {founder, query, targetPage, schedule}; Use Gmail API (MCP for Shawn); Feed matching emails to Claude agent; Agent outputs JSON updates with confidence; Append to target wiki page via GitHub API; Add source-link markdown [[source][gmail://id]]",
+        "testStrategy": "Create dummy watcher file; Verify runner parses/executes on schedule; Test Gmail query returns 3+ emails; Check lane page updates with confidence markers and clickable source links",
         "priority": "medium",
         "dependencies": [
-          37,
-          40
+          50
         ],
         "status": "pending",
         "subtasks": []
       },
       {
-        "id": 43,
-        "title": "Create Founder Lanes and Brainstorm Display Components",
-        "description": "Render founder directories with standard lane template and home screen 2-3 active items",
-        "details": "Read founders/[shawn|mark|michael]/{lane,brainstorm}/ listing latest 2-3 active lane items per founder for home card(equal size, color left-border 4px). Lane pages: title,status,why,next,zone,reverse-chrono log template. Brainstorms freeform no template. Exploring zone dimmed/tagged. Recent-update subtle markers.",
-        "testStrategy": "Test home lanes equal visual weight, color borders correct, lane pages follow template, 2-3 truncation works, exploring items dimmed, founder-specific paths",
+        "id": 52,
+        "title": "Ship Shawn's EDE watcher",
+        "description": "Create watchers/shawn-ede.md from design template; connect Shawn's Gmail via MCP; verify EDE lane auto-updates from real CMS/ID.me emails",
+        "details": "Template: frontmatter with query:'from:(id.me OR cms.gov) (EDE|renewal|status)', target:'wiki/lanes/ede.md', schedule:'daily'; Test with Shawn's real credentials; Agent extracts status/expiry/dates with high-confidence explicit statements; Add 'needs-confirmation' badge for medium/low",
+        "testStrategy": "Run watcher manually x3 days; Verify EDE lane updates from real emails; Check confidence markers (explicit renewal=high); Tune ignore list for marketing emails",
         "priority": "medium",
         "dependencies": [
-          37,
-          40
+          51
         ],
         "status": "pending",
         "subtasks": []
       },
       {
-        "id": 44,
-        "title": "Implement Meeting Quick-Launch and Tasks/Tools Cards",
-        "description": "Add one-tap Google Meet + Tasks tabbed view + Tools 2x3 grid to home screen",
-        "details": "Meeting button: window.open('https://meet.google.com/new'), navigator.clipboard.writeText(link), toast 'Link copied!', sms://+mailto: deeplinks. Tasks: ToDo/Done tabs from tasks.md, owner color dots, prep dotted-circle gray. Tools: hardcoded 2x3 grid linking Gmail/Drive/Cap/Manifesto/Chat/Calendar. State sentence editable MD field.",
-        "testStrategy": "Test meet link generates/copies, deeplinks open native apps, Tasks tabs switch+color coding, Tools grid 2x3 responsive, state sentence saves to file",
+        "id": 53,
+        "title": "Build iMessage SQLite reader",
+        "description": "Python cron script on Shawn's Mac reads ~/Library/Messages/chat.db, filters founders group chat, exports new messages to raw/imessage/YYYY-MM-DD.md every 15min",
+        "details": "pip install sqlite3 pandas; Query: SELECT text, date, handle_id FROM messages WHERE date>last_run AND handle_id IN (founders_chat_ids); Format markdown timeline with timestamps/senders/text; Track last_run timestamp in .last_run file; git commit via API; Handle offline catch-up",
+        "testStrategy": "Send 10 test messages in group chat; Verify script captures exactly founders chat only; Check raw/imessage/ files contain complete thread since last run; Test catch-up after 1hr offline",
         "priority": "medium",
         "dependencies": [
-          37
+          52
         ],
         "status": "pending",
         "subtasks": []
       },
       {
-        "id": 45,
-        "title": "Setup Vercel Deployment with Custom Domain and Environment Variables",
-        "description": "Configure Vercel project linking GitHub repo with app.tribebenefits.com domain and env vars",
-        "details": "Vercel dashboard: import tribe-founders-wiki repo, auto-deploys on main push. Add env vars: APP_PASSWORD, GITHUB_PAT. Custom domain app.tribebenefits.com (DNS CNAME). Enable ISR for dynamic pages. Password protection via middleware (not Vercel feature). Test mobile performance <2s load.",
-        "testStrategy": "Test auto-deploys on git push, domain resolves, env vars load (no leaks), middleware protects all routes, mobile Lighthouse score >90, <2s home load",
-        "priority": "high",
+        "id": 54,
+        "title": "Implement reimbursement extractor agent",
+        "description": "Agent processes raw/imessage/ files, pattern-matches dollar amounts with context verbs, creates/updates wiki/reimbursements.md with checkboxes/balances",
+        "details": "Regex: (spent|paid|expensed|reimburse).*?\\$?([0-9,]+\\.?[0-9]{2}); Claude agent validates context + extracts who/purpose/date; Append to reimbursements.md table: | Date | Who | Amount | Description | [x] Settled |; Calculate running balances per founder; Dedup by message ID",
+        "testStrategy": "Test with 20 sample messages (10 true positives, 10 false like 'about $50'); Verify >90% accuracy; Check table updates and balances math correct; Test settle checkbox updates via review UI",
+        "priority": "medium",
         "dependencies": [
-          35,
-          36,
-          40
+          53
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 55,
+        "title": "Build commitment extractor and search upgrade",
+        "description": "Extract commitments/decisions from iMessage to Group Table/lanes; Implement semantic+keyword search across wiki/raw with sqlite-vec embeddings and source links",
+        "details": "Commitment agent: Claude prompt for action items/owners from iMessage; Update Group Table md table; Search: sqlite-vec DB, sentence-transformers/all-MiniLM-L6-v2; Chunk wiki+raw files to 512t; Query route: len<4 words=sqlite FTS5 keyword, else cosine sim top-5; UI shows synthesized answer + [[source]] links",
+        "testStrategy": "iMessage: extract 5 real commitments accurately; Search: 10 queries (5 keyword, 5 semantic) return relevant results <2s with source links; Verify raw transcript fallback works; Test confidence badges render",
+        "priority": "medium",
+        "dependencies": [
+          54
         ],
         "status": "pending",
         "subtasks": []
@@ -150,7 +132,7 @@
     ],
     "metadata": {
       "created": "2026-04-10T18:42:14.007Z",
-      "updated": "2026-04-10T18:54:48.262Z",
+      "updated": "2026-04-10T19:07:21.748Z",
       "description": "Tasks for master context"
     }
   }

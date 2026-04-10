@@ -1,6 +1,14 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import Home from "../app/page";
+import HomeClient from "../app/components/HomeClient";
+import {
+  radarItems,
+  groupTableItems,
+  laneItems,
+  taskItems,
+  toolItems,
+  businessStateSentence,
+} from "../lib/data";
 
 // Mock next/link
 jest.mock("next/link", () => {
@@ -21,9 +29,18 @@ jest.mock("next/link", () => {
   };
 });
 
+const defaultProps = {
+  radarItems,
+  groupTableItems,
+  laneItems,
+  taskItems,
+  toolItems,
+  businessStateSentence,
+};
+
 describe("Home page", () => {
   beforeEach(() => {
-    render(<Home />);
+    render(<HomeClient {...defaultProps} />);
   });
 
   it("renders the TriBe logo", () => {

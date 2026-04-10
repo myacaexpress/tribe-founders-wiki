@@ -12,6 +12,7 @@ export default function AddPage() {
   >("lane");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -20,12 +21,26 @@ export default function AddPage() {
     setLoading(true);
 
     try {
-      // For Phase 1, just log and show success
-      console.log("Add Something:", { content, destination });
+      const response = await fetch("/api/add", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          content: content.trim(),
+          destination: destination === "email" ? "lane" : destination,
+        }),
+      });
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to save");
+      }
 
+      const result = await response.json();
+
+      // Show the conversational confirmation message
+      setSuccessMessage(result.message || "Got it!");
       setSuccess(true);
       setContent("");
 
@@ -33,6 +48,9 @@ export default function AddPage() {
       setTimeout(() => {
         router.back();
       }, 1500);
+    } catch (error) {
+      console.error("Error saving:", error);
+      alert(error instanceof Error ? error.message : "Failed to save");
     } finally {
       setLoading(false);
     }
@@ -56,7 +74,7 @@ export default function AddPage() {
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center">
               <div className="text-4xl mb-4">✓</div>
-              <p className="text-[#1a1a1a] font-serif text-lg">Got it!</p>
+              <p className="text-[#1a1a1a] font-serif text-lg">{successMessage}</p>
               <p className="text-[#8a8580] text-sm mt-2">Closing in a moment...</p>
             </div>
           </div>
