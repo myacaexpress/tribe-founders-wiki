@@ -23,7 +23,7 @@ interface ProcessingResult {
   summary?: string;
 }
 
-type PageState = "idle" | "recording" | "processing" | "review" | "saving" | "saved" | "error";
+type PageState = "idle" | "recording" | "processing" | "review" | "saving" | "saved" | "briefing" | "error";
 
 export default function MeetingPage() {
   const [state, setState] = useState<PageState>("idle");
@@ -40,6 +40,7 @@ export default function MeetingPage() {
   const [reviewItems, setReviewItems] = useState<ReviewItem[]>([]);
   const [errorMessage, setErrorMessage] = useState("");
   const [saveMessage, setSaveMessage] = useState("");
+  const [briefContent, setBriefContent] = useState("");
   const [processingStep, setProcessingStep] = useState<"transcribing" | "processing">(
     "transcribing"
   );
@@ -224,6 +225,28 @@ export default function MeetingPage() {
     }));
   };
 
+  const generateBrief = async () => {
+    setState("briefing");
+    try {
+      const response = await fetch("/api/meeting/brief", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title: meetingTitle || "Founders Sync" }),
+      });
+
+      if (!response.ok) throw new Error("Failed to generate brief");
+
+      const data = await response.json();
+      setBriefContent(data.brief);
+    } catch (error) {
+      console.error("Error generating brief:", error);
+      setErrorMessage(
+        error instanceof Error ? error.message : "Failed to generate brief"
+      );
+      setState("error");
+    }
+  };
+
   const resetForm = () => {
     setMeetingTitle("");
     setAttendees({ shawn: true, mark: true, michael: true });
@@ -232,6 +255,7 @@ export default function MeetingPage() {
     setReviewItems([]);
     setErrorMessage("");
     setSaveMessage("");
+    setBriefContent("");
     setRecordingTime(0);
     chunksRef.current = [];
     setState("idle");
@@ -454,13 +478,21 @@ export default function MeetingPage() {
                 </div>
               </div>
 
-              {/* Start recording button */}
-              <button
-                onClick={startRecording}
-                className="w-full py-4 px-4 bg-[#2b8a88] text-white rounded-lg font-semibold text-lg hover:opacity-90 transition-opacity"
-              >
-                Start Recording
-              </button>
+              {/* Action buttons */}
+              <div className="flex flex-col gap-3">
+                <button
+                  onClick={startRecording}
+                  className="w-full py-4 px-4 bg-[#2b8a88] text-white rounded-lg font-semibold text-lg hover:opacity-90 transition-opacity"
+                >
+                  Start Recording
+                </button>
+                <button
+                  onClick={generateBrief}
+                  className="w-full py-3 px-4 border border-[#eae4da] bg-white text-[#1a1a1a] rounded-lg font-semibold hover:bg-[#faf7f2] transition-colors"
+                >
+                  Generate Pre-Meeting Brief
+                </button>
+              </div>
             </div>
           </>
         )}
@@ -525,6 +557,116 @@ export default function MeetingPage() {
               <p className="text-sm text-[#8a8580]">
                 This may take a moment
               </p>
+            </div>
+          </>
+        )}
+
+        {/* BRIEFING STATE */}
+        {state === "briefing" && !briefContent && (
+          <>
+            <h1 className="serif-heading text-3xl mb-8 text-[#1a1a1a]">
+              Generating Brief
+            </h1>
+            <div className="space-y-6 flex flex-col items-center justify-center min-h-[400px]">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#2b8a88]" />
+              <p className="text-lg text-[#1a1a1a] font-medium">
+                Pulling data from the wiki...
+              </p>
+            </div>
+          </>
+        )}
+
+        {state === "briefing" && briefContent && (
+          <>
+            <h1 className="serif-heading text-3xl mb-8 text-[#1a1a1a]">
+              Pre-Meeting Brief
+            </h1>
+            <div className="space-y-6">
+              <div className="bg-white border border-[#eae4da] rounded-lg p-6">
+                <div className="prose prose-sm max-w-none text-[#1a1a1a]">
+                  {briefContent.split("\n").map((line, i) => {
+                    if (line.startsWith("# ")) {
+                      return (
+                        <h1
+                          key={i}
+                          className="serif-heading text-xl mb-2 text-[#1a1a1a]"
+                        >
+                          {line.replace("# ", "")}
+                        </h1>
+                      );
+                    }
+                    if (line.startsWith("## ")) {
+                      return (
+                        <h2
+                          key={i}
+                          className="serif-heading text-lg mt-4 mb-2 text-[#2b8a88]"
+                        >
+                          {line.replace("## ", "")}
+                        </h2>
+                      );
+                    }
+                    if (line.startsWith("### ")) {
+                      return (
+                        <h3
+                          key={i}
+                          className="text-sm font-bold mt-3 mb-1 text-[#1a1a1a] capitalize"
+                        >
+                          {line.replace("### ", "")}
+                        </h3>
+                      );
+                    }
+                    if (line.startsWith("- [ ] ")) {
+                      return (
+                        <div key={i} className="flex items-start gap-2 ml-2 text-sm">
+                          <span className="text-[#8a8580] mt-0.5">&#9633;</span>
+                          <span>{line.replace("- [ ] ", "")}</span>
+                        </div>
+                      );
+                    }
+                    if (line.startsWith("- ")) {
+                      return (
+                        <div key={i} className="flex items-start gap-2 ml-2 text-sm">
+                          <span className="text-[#2b8a88] mt-0.5">&#8226;</span>
+                          <span>{line.replace("- ", "")}</span>
+                        </div>
+                      );
+                    }
+                    if (line.startsWith("**")) {
+                      return (
+                        <p key={i} className="text-sm text-[#8a8580]">
+                          {line.replace(/\*\*/g, "")}
+                        </p>
+                      );
+                    }
+                    if (line.trim() === "") {
+                      return <div key={i} className="h-2" />;
+                    }
+                    return (
+                      <p key={i} className="text-sm">
+                        {line}
+                      </p>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-3">
+                <button
+                  onClick={() => {
+                    setBriefContent("");
+                    setState("idle");
+                  }}
+                  className="w-full py-3 px-4 bg-[#2b8a88] text-white rounded-lg font-semibold hover:opacity-90 transition-opacity"
+                >
+                  Ready — Start Recording
+                </button>
+                <button
+                  onClick={resetForm}
+                  className="w-full py-3 px-4 border border-[#eae4da] bg-white text-[#1a1a1a] rounded-lg font-semibold hover:bg-[#faf7f2] transition-colors"
+                >
+                  Back
+                </button>
+              </div>
             </div>
           </>
         )}
