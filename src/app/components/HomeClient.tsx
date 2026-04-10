@@ -79,13 +79,21 @@ export default function HomeClient({
           </p>
         </div>
 
-        {/* Start Meeting Now button */}
-        <Link
-          href="/meeting"
-          className="block w-full mb-4 btn-primary text-center"
-        >
-          Start Meeting Now
-        </Link>
+        {/* Action buttons */}
+        <div className="flex gap-3 mb-4">
+          <Link
+            href="/meeting"
+            className="flex-1 btn-primary text-center"
+          >
+            Start Meeting Now
+          </Link>
+          <Link
+            href="/watchers"
+            className="flex-none px-4 py-2 border border-[#eae4da] bg-white text-[#1a1a1a] rounded-lg font-semibold text-sm hover:bg-[#faf7f2] transition-colors flex items-center"
+          >
+            Watchers
+          </Link>
+        </div>
 
         {/* Radar card */}
         <div className="card mb-4">
