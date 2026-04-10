@@ -256,42 +256,70 @@ export default function MeetingPage() {
     }
   };
 
-  const buildCalendarUrl = () => {
+  const buildCalendarFallbackUrl = () => {
     const title = meetingTitle || "Founders Meeting";
 
-    // Build start/end times (now → now + 1 hour) in Google Calendar format
+    // Build start/end times in Google Calendar format (YYYYMMDDTHHmmssZ)
     const now = new Date();
     const end = new Date(now.getTime() + 60 * 60 * 1000);
     const fmt = (d: Date) =>
       d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
     const dates = `${fmt(now)}/${fmt(end)}`;
 
-    // Collect emails of selected attendees
     const attendeeEmails = Object.entries(attendees)
       .filter(([, checked]) => checked)
       .map(([key]) => FOUNDER_EMAILS[key])
       .filter(Boolean)
       .join(",");
 
+    // /r/eventedit is the mobile-friendly Calendar URL (works on iOS/Android);
+    // /calendar/render redirects to Google Contacts on mobile.
     const params = new URLSearchParams({
-      action: "TEMPLATE",
-      text: title,
+      title,
       dates,
       conferenceType: "hangoutsMeet",
       crm: "BUSY",
     });
     if (attendeeEmails) params.set("add", attendeeEmails);
 
-    return `https://calendar.google.com/calendar/render?${params.toString()}`;
+    return `https://calendar.google.com/calendar/r/eventedit?${params.toString()}`;
   };
 
   const startMeetingWithRecording = async () => {
-    // Open Google Calendar event creator (pre-filled with title, attendees,
-    // and conferenceType=hangoutsMeet so a Meet link is auto-attached).
-    // The user just taps Save — everyone gets an invite with the Meet link.
-    window.open(buildCalendarUrl(), "_blank");
-    // Simultaneously start local mic recording as a companion
-    await startRecording();
+    // Start recording immediately — runs in parallel with meeting creation
+    startRecording();
+
+    // Try the server-side Calendar API route first (returns a direct Meet link)
+    try {
+      const attendeeEmails = Object.entries(attendees)
+        .filter(([, checked]) => checked)
+        .map(([key]) => FOUNDER_EMAILS[key])
+        .filter(Boolean);
+
+      const res = await fetch("/api/meeting/create-meet", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: meetingTitle || "Founders Meeting",
+          attendees: attendeeEmails,
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data.meetLink) {
+          setMeetUrl(data.meetLink);
+          window.open(data.meetLink, "_blank");
+          return;
+        }
+      }
+      // status 501 means service account not configured yet — fall through
+    } catch {
+      // Network error — fall through to URL fallback
+    }
+
+    // Fallback: open the mobile-friendly Google Calendar event editor
+    window.open(buildCalendarFallbackUrl(), "_blank");
   };
 
   const copyMeetUrl = async () => {
