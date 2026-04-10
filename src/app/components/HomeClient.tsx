@@ -7,7 +7,6 @@ import type {
   GroupTableItem,
   LaneItem,
   TaskItem,
-  ToolItem,
 } from "@/lib/data";
 
 export interface HomeClientProps {
@@ -15,7 +14,6 @@ export interface HomeClientProps {
   groupTableItems: GroupTableItem[];
   laneItems: Record<string, LaneItem[]>;
   taskItems: TaskItem[];
-  toolItems: ToolItem[];
   businessStateSentence: string;
 }
 
@@ -24,7 +22,6 @@ export default function HomeClient({
   groupTableItems,
   laneItems,
   taskItems,
-  toolItems,
   businessStateSentence,
 }: HomeClientProps) {
   const [activeTab, setActiveTab] = useState<"todo" | "done">("todo");
@@ -270,27 +267,6 @@ export default function HomeClient({
                   {task.title}
                 </p>
               </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Tools card */}
-        <div className="card mb-4">
-          <h2 className="serif-heading text-lg mb-4 text-[#1a1a1a]">Tools</h2>
-          <div className="grid grid-cols-3 gap-3">
-            {toolItems.map((tool) => (
-              <a
-                key={tool.id}
-                href={tool.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex flex-col items-center justify-center p-4 rounded-lg border border-[#eae4da] bg-white hover:bg-[#faf7f2] transition-colors"
-              >
-                <div className="text-2xl mb-2">{tool.icon}</div>
-                <p className="text-xs font-medium text-[#1a1a1a] text-center">
-                  {tool.name}
-                </p>
-              </a>
             ))}
           </div>
         </div>

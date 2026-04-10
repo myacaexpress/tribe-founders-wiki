@@ -10,7 +10,6 @@ export default async function Home() {
       groupTableItems={data.groupTableItems}
       laneItems={data.laneItems}
       taskItems={data.taskItems}
-      toolItems={data.toolItems}
       businessStateSentence={data.businessStateSentence}
     />
   );

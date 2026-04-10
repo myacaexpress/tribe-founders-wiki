@@ -10,7 +10,6 @@ import {
   groupTableItems as fallbackGroupTableItems,
   laneItems as fallbackLaneItems,
   taskItems as fallbackTaskItems,
-  toolItems as fallbackToolItems,
   businessStateSentence as fallbackBusinessState,
 } from "./data";
 import {
@@ -25,7 +24,6 @@ import type {
   GroupTableItem,
   LaneItem,
   TaskItem,
-  ToolItem,
 } from "./data";
 
 export interface HomePageData {
@@ -33,7 +31,6 @@ export interface HomePageData {
   groupTableItems: GroupTableItem[];
   laneItems: Record<string, LaneItem[]>;
   taskItems: TaskItem[];
-  toolItems: ToolItem[];
   businessStateSentence: string;
 }
 
@@ -64,7 +61,6 @@ export async function getData(): Promise<HomePageData> {
         laneItems:
           Object.keys(laneItems).length > 0 ? laneItems : fallbackLaneItems,
         taskItems: taskItems.length > 0 ? taskItems : fallbackTaskItems,
-        toolItems: fallbackToolItems,
         businessStateSentence:
           businessState.length > 0
             ? businessState
@@ -82,7 +78,6 @@ export async function getData(): Promise<HomePageData> {
     groupTableItems: fallbackGroupTableItems,
     laneItems: fallbackLaneItems,
     taskItems: fallbackTaskItems,
-    toolItems: fallbackToolItems,
     businessStateSentence: fallbackBusinessState,
   };
 }
