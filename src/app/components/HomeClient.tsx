@@ -17,13 +17,12 @@ export interface HomeClientProps {
   businessStateSentence: string;
 }
 
-const SCENIC_BG = "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1080&q=80";
-
 const glass = {
-  background: "rgba(255,255,255,0.18)",
-  backdropFilter: "blur(24px)",
-  WebkitBackdropFilter: "blur(24px)",
-  boxShadow: "0 8px 32px rgba(0,0,0,0.25)",
+  background: "rgba(255,255,255,0.22)",
+  backdropFilter: "blur(28px)",
+  WebkitBackdropFilter: "blur(28px)",
+  boxShadow: "0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.2)",
+  borderRadius: "20px",
 } as React.CSSProperties;
 
 export default function HomeClient({
@@ -59,92 +58,85 @@ export default function HomeClient({
 
   return (
     <div
-      className="min-h-screen pb-24"
+      className="min-h-screen pb-24 px-5"
       style={{
-        backgroundImage: `linear-gradient(to bottom, rgba(6,45,45,0.75) 0%, rgba(6,45,45,0.5) 40%, rgba(180,80,50,0.55) 80%, rgba(60,20,10,0.8) 100%), url(${SCENIC_BG})`,
+        backgroundImage: `linear-gradient(175deg, rgba(10,46,56,0.82) 0%, rgba(26,74,74,0.72) 25%, rgba(45,107,90,0.6) 40%, rgba(199,106,74,0.65) 65%, rgba(232,149,106,0.5) 80%, rgba(42,26,46,0.85) 100%), url('/bg-sunset.jpg')`,
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundAttachment: "fixed",
       }}
     >
-      <div className="container-main py-6">
+      <div className="max-w-lg mx-auto py-8 space-y-5">
 
         {/* Logo header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold font-serif">
+        <div className="text-center pt-2 pb-2">
+          <h1 className="text-5xl font-bold font-serif">
             <span className="text-white">Tri</span>
             <span className="text-[#ff7b6b]">Be</span>
           </h1>
-          <p className="text-xs font-semibold text-white/50 tracking-widest mt-1">
+          <p className="text-sm font-semibold text-white/70 tracking-widest mt-2">
             FOUNDERS — FLORIDA
           </p>
         </div>
 
         {/* State sentence card */}
-        <div className="rounded-2xl border border-white/30 p-5 mb-4" style={glass}>
+        <div className="border border-white/35 p-6" style={glass}>
           <p className="text-white font-serif text-lg leading-relaxed">
             {businessStateSentence}
           </p>
         </div>
 
-        {/* Action buttons */}
-        <div className="flex gap-2 mb-4 flex-wrap">
+        {/* Action buttons — scrollable pill row */}
+        <div className="flex gap-3 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
           <a
             href="https://meet.google.com/new"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-1 btn-primary text-center text-sm py-2"
+            className="flex-none px-5 py-2.5 bg-[#00c9a7] text-white rounded-full font-bold text-sm whitespace-nowrap hover:opacity-90 transition-opacity"
           >
             Meet
           </a>
-          <Link
-            href="/meeting"
-            className="flex-none px-3 py-2 border border-white/30 rounded-full font-semibold text-sm text-white hover:bg-white/10 transition-colors"
-            style={{ background: "rgba(255,255,255,0.18)" }}
-          >
-            Record
-          </Link>
-          <Link
-            href="/watchers"
-            className="flex-none px-3 py-2 border border-white/30 rounded-full font-semibold text-sm text-white hover:bg-white/10 transition-colors"
-            style={{ background: "rgba(255,255,255,0.18)" }}
-          >
-            Watchers
-          </Link>
-          <Link
-            href="/search"
-            className="flex-none px-3 py-2 border border-white/30 rounded-full font-semibold text-sm text-white hover:bg-white/10 transition-colors"
-            style={{ background: "rgba(255,255,255,0.18)" }}
-          >
-            Search
-          </Link>
+          {[
+            { href: "/meeting", label: "Record" },
+            { href: "/watchers", label: "Watchers" },
+            { href: "/search",   label: "Search" },
+            { href: "/wiki",     label: "Full Wiki" },
+          ].map(({ href, label }) => (
+            <Link
+              key={href}
+              href={href}
+              className="flex-none px-5 py-2.5 border border-white/35 rounded-full font-semibold text-sm text-white whitespace-nowrap hover:bg-white/20 transition-colors"
+              style={{ background: "rgba(255,255,255,0.18)" }}
+            >
+              {label}
+            </Link>
+          ))}
         </div>
 
-        {/* Radar card */}
-        <div className="rounded-2xl border border-white/30 p-5 mb-4" style={glass}>
-          <h2 className="serif-heading text-lg mb-4 text-white font-bold">Radar</h2>
+        {/* Radar card — each item is its own mini card */}
+        <div className="border border-white/35 p-6" style={glass}>
+          <h2 className="serif-heading text-xl mb-4 text-white font-bold">Radar</h2>
           <div className="space-y-3">
             {radarItems.map((item) => (
               <div
                 key={item.id}
-                className="flex gap-3 pb-3 border-b border-white/10 last:border-b-0"
+                className="flex gap-3 p-4 rounded-xl border border-white/15"
+                style={{ background: "rgba(255,255,255,0.1)" }}
               >
                 <div
-                  className={`w-3 h-3 rounded-full flex-shrink-0 mt-1 ${
-                    item.level === "red"
-                      ? "bg-[#e85d4e]"
-                      : item.level === "amber"
-                      ? "bg-amber-400"
-                      : "bg-[#b8c8b0]"
+                  className={`w-2.5 h-2.5 rounded-full flex-shrink-0 mt-1.5 ${
+                    item.level === "red"   ? "bg-[#e85d4e]"
+                    : item.level === "amber" ? "bg-amber-400"
+                    : "bg-[#b8c8b0]"
                   }`}
                 />
-                <div className="flex-1">
-                  <p className="font-medium text-white">{item.title}</p>
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-white leading-snug">{item.title}</p>
                   {item.description && (
-                    <p className="text-sm text-white/60">{item.description}</p>
+                    <p className="text-sm text-white/60 mt-0.5">{item.description}</p>
                   )}
                   {item.daysUntil && (
-                    <p className="text-xs text-white/50 mt-1">{item.daysUntil} days</p>
+                    <p className="text-xs text-[#00c9a7] font-semibold mt-1">{item.daysUntil} days</p>
                   )}
                 </div>
               </div>
@@ -153,14 +145,18 @@ export default function HomeClient({
         </div>
 
         {/* Group Table card */}
-        <div className="rounded-2xl border border-white/30 p-5 mb-4" style={glass}>
-          <h2 className="serif-heading text-lg mb-4 text-white font-bold">Group Table</h2>
+        <div className="border border-white/35 p-6" style={glass}>
+          <h2 className="serif-heading text-xl mb-4 text-white font-bold">Group Table</h2>
           <div className="space-y-3">
             {groupTableItems.map((item) => (
-              <div key={item.id} className="pb-3 border-b border-white/10 last:border-b-0">
-                <div className="flex items-start justify-between mb-1">
-                  <p className="font-medium text-white">{item.title}</p>
-                  <span className={`text-xs font-medium px-2 py-1 rounded-full ${getStatusBadge(item.status)}`}>
+              <div
+                key={item.id}
+                className="p-4 rounded-xl border border-white/15"
+                style={{ background: "rgba(255,255,255,0.1)" }}
+              >
+                <div className="flex items-start justify-between gap-2 mb-1">
+                  <p className="font-semibold text-white leading-snug">{item.title}</p>
+                  <span className={`text-xs font-semibold px-2.5 py-1 rounded-full flex-shrink-0 ${getStatusBadge(item.status)}`}>
                     {item.status}
                   </span>
                 </div>
@@ -171,125 +167,85 @@ export default function HomeClient({
         </div>
 
         {/* Lanes card */}
-        <div className="rounded-2xl border border-white/30 p-5 mb-4" style={glass}>
-          <h2 className="serif-heading text-lg mb-4 text-white font-bold">Lanes</h2>
-          <div className="space-y-4">
-            <div>
-              <h3 className="text-sm font-semibold text-[#00c9a7] mb-2">Shawn</h3>
-              <div className="space-y-2 pl-4 border-l-2 border-[#00c9a7]">
-                {laneItems.shawn?.map((lane) => (
-                  <div key={lane.id} className="text-sm">
-                    <p className="font-medium text-white">{lane.title}</p>
-                    <p className="text-xs text-white/60">{lane.description}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div>
-              <h3 className="text-sm font-semibold text-[#ff7b6b] mb-2">Mark</h3>
-              <div className="space-y-2 pl-4 border-l-2 border-[#ff7b6b]">
-                {laneItems.mark?.map((lane) => (
-                  <div key={lane.id} className="text-sm">
-                    <p className="font-medium text-white">{lane.title}</p>
-                    <p className="text-xs text-white/60">{lane.description}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div>
-              <h3 className="text-sm font-semibold text-[#b8c8b0] mb-2">Michael</h3>
-              <div className="space-y-2 pl-4 border-l-2 border-[#b8c8b0]">
-                {laneItems.michael?.map((lane) => (
-                  <div key={lane.id} className="text-sm">
-                    <p className="font-medium text-white">{lane.title}</p>
-                    <p className="text-xs text-white/60">{lane.description}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Tasks card */}
-        <div className="rounded-2xl border border-white/30 p-5 mb-4" style={glass}>
-          <h2 className="serif-heading text-lg mb-4 text-white font-bold">Tasks</h2>
-          <div className="mb-4 flex gap-2 border-b border-white/20">
-            <button
-              onClick={() => setActiveTab("todo")}
-              className={`px-3 py-2 text-sm font-medium transition-colors ${
-                activeTab === "todo"
-                  ? "text-[#00c9a7] border-b-2 border-[#00c9a7]"
-                  : "text-white/50"
-              }`}
-            >
-              To Do ({todoItems.length})
-            </button>
-            <button
-              onClick={() => setActiveTab("done")}
-              className={`px-3 py-2 text-sm font-medium transition-colors ${
-                activeTab === "done"
-                  ? "text-[#00c9a7] border-b-2 border-[#00c9a7]"
-                  : "text-white/50"
-              }`}
-            >
-              Done ({doneItems.length})
-            </button>
-          </div>
-          <div className="space-y-2">
-            {(activeTab === "todo" ? todoItems : doneItems).map((task) => (
-              <div
-                key={task.id}
-                className="flex items-center gap-3 p-3 rounded-xl"
-                style={{ background: "rgba(255,255,255,0.15)" }}
-              >
-                <input
-                  type="checkbox"
-                  checked={task.done}
-                  readOnly
-                  className="w-4 h-4"
-                />
-                <p className={`text-sm font-medium ${getFounderColor(task.founder)}`}>
-                  {task.title}
-                </p>
+        <div className="border border-white/35 p-6" style={glass}>
+          <h2 className="serif-heading text-xl mb-4 text-white font-bold">Lanes</h2>
+          <div className="space-y-5">
+            {[
+              { key: "shawn",   label: "Shawn",   color: "#00c9a7", items: laneItems.shawn },
+              { key: "mark",    label: "Mark",    color: "#ff7b6b", items: laneItems.mark },
+              { key: "michael", label: "Michael", color: "#b8c8b0", items: laneItems.michael },
+            ].map(({ key, label, color, items }) => (
+              <div key={key}>
+                <h3 className="text-sm font-bold mb-2" style={{ color }}>{label}</h3>
+                <div className="space-y-2 pl-4 border-l-2" style={{ borderColor: color }}>
+                  {items?.map((lane) => (
+                    <div key={lane.id}>
+                      <p className="font-medium text-white text-sm">{lane.title}</p>
+                      <p className="text-xs text-white/60">{lane.description}</p>
+                    </div>
+                  ))}
+                </div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Open Full Wiki link */}
-        <Link
-          href="/wiki"
-          className="block w-full text-center py-3 px-4 border border-white/30 rounded-full text-white font-semibold hover:bg-white/10 transition-colors mb-4"
-          style={{ background: "rgba(255,255,255,0.15)" }}
-        >
-          Open Full Wiki
-        </Link>
+        {/* Tasks card */}
+        <div className="border border-white/35 p-6" style={glass}>
+          <h2 className="serif-heading text-xl mb-4 text-white font-bold">Tasks</h2>
+          {/* Tab row — pill buttons, scrollable */}
+          <div className="flex gap-2 mb-4 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
+            {(["todo", "done"] as const).map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className="flex-none px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-all"
+                style={activeTab === tab
+                  ? { background: "#00c9a7", color: "#fff" }
+                  : { background: "rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.2)" }
+                }
+              >
+                {tab === "todo" ? `To Do (${todoItems.length})` : `Done (${doneItems.length})`}
+              </button>
+            ))}
+          </div>
+          <div className="space-y-2">
+            {(activeTab === "todo" ? todoItems : doneItems).map((task) => (
+              <div
+                key={task.id}
+                className="flex items-center gap-3 p-3.5 rounded-xl border border-white/15"
+                style={{ background: "rgba(255,255,255,0.1)" }}
+              >
+                <input type="checkbox" checked={task.done} readOnly className="w-4 h-4 flex-shrink-0" />
+                <p className={`text-sm font-medium ${getFounderColor(task.founder)}`}>{task.title}</p>
+              </div>
+            ))}
+          </div>
+        </div>
 
         {/* This Week timeline card */}
-        <div className="rounded-2xl border border-white/30 p-5" style={glass}>
-          <h2 className="serif-heading text-lg mb-4 text-white font-bold">This Week</h2>
+        <div className="border border-white/35 p-6" style={glass}>
+          <h2 className="serif-heading text-xl mb-4 text-white font-bold">This Week</h2>
           <div className="relative pl-6">
             <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-white/20" />
             <div className="space-y-4">
-              <div className="relative">
-                <div className="absolute -left-4 top-1 w-3 h-3 rounded-full bg-[#e85d4e]" />
-                <p className="font-medium text-white">April 12: Carrier meeting (Humana)</p>
-              </div>
-              <div className="relative">
-                <div className="absolute -left-4 top-1 w-3 h-3 rounded-full bg-[#00c9a7]" />
-                <p className="font-medium text-white">April 14: Tech stack decision</p>
-              </div>
-              <div className="relative">
-                <div className="absolute -left-4 top-1 w-3 h-3 rounded-full bg-[#b8c8b0]" />
-                <p className="font-medium text-white">April 15: Financial model review</p>
-              </div>
+              {[
+                { color: "#e85d4e", text: "April 12: Carrier meeting (Humana)" },
+                { color: "#00c9a7", text: "April 14: Tech stack decision" },
+                { color: "#b8c8b0", text: "April 15: Financial model review" },
+              ].map(({ color, text }) => (
+                <div key={text} className="relative">
+                  <div className="absolute -left-[1.35rem] top-1 w-3 h-3 rounded-full" style={{ background: color }} />
+                  <p className="font-semibold text-white">{text}</p>
+                </div>
+              ))}
             </div>
           </div>
         </div>
 
       </div>
 
-      {/* Add Something FAB */}
+      {/* FAB */}
       <Link
         href="/add"
         className="fixed bottom-8 right-6 w-14 h-14 bg-[#e85d4e] text-white rounded-full flex items-center justify-center font-bold text-xl hover:opacity-90 transition-opacity shadow-lg"

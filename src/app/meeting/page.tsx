@@ -431,26 +431,25 @@ export default function MeetingPage() {
     }
   };
 
-  const SCENIC_BG = "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1080&q=80";
-
   const glassStyle = {
-    background: "rgba(255,255,255,0.18)",
-    backdropFilter: "blur(24px)",
-    WebkitBackdropFilter: "blur(24px)",
-    boxShadow: "0 8px 32px rgba(0,0,0,0.25)",
+    background: "rgba(255,255,255,0.22)",
+    backdropFilter: "blur(28px)",
+    WebkitBackdropFilter: "blur(28px)",
+    boxShadow: "0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.2)",
+    borderRadius: "20px",
   } as React.CSSProperties;
 
   return (
     <div
-      className="min-h-screen pb-24"
+      className="min-h-screen pb-24 px-5"
       style={{
-        backgroundImage: `linear-gradient(to bottom, rgba(6,45,45,0.75) 0%, rgba(6,45,45,0.5) 40%, rgba(180,80,50,0.55) 80%, rgba(60,20,10,0.8) 100%), url(${SCENIC_BG})`,
+        backgroundImage: `linear-gradient(175deg, rgba(10,46,56,0.82) 0%, rgba(26,74,74,0.72) 25%, rgba(45,107,90,0.6) 40%, rgba(199,106,74,0.65) 65%, rgba(232,149,106,0.5) 80%, rgba(42,26,46,0.85) 100%), url('/bg-sunset.jpg')`,
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundAttachment: "fixed",
       }}
     >
-      <div className="container-main py-6">
+      <div className="max-w-lg mx-auto py-8">
 
         {/* Logo + back */}
         <div className="text-center mb-6">
