@@ -480,11 +480,19 @@ export default function MeetingPage() {
 
               {/* Action buttons */}
               <div className="flex flex-col gap-3">
+                <a
+                  href="https://meet.google.com/new"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full py-4 px-4 bg-[#2b8a88] text-white rounded-lg font-semibold text-lg hover:opacity-90 transition-opacity text-center"
+                >
+                  Start Google Meet
+                </a>
                 <button
                   onClick={startRecording}
-                  className="w-full py-4 px-4 bg-[#2b8a88] text-white rounded-lg font-semibold text-lg hover:opacity-90 transition-opacity"
+                  className="w-full py-3 px-4 border-2 border-[#2b8a88] text-[#2b8a88] rounded-lg font-semibold hover:bg-[#f0f8f7] transition-colors"
                 >
-                  Start Recording
+                  Record Audio Only
                 </button>
                 <button
                   onClick={generateBrief}

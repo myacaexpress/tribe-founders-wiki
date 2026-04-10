@@ -81,11 +81,19 @@ export default function HomeClient({
 
         {/* Action buttons */}
         <div className="flex gap-3 mb-4">
-          <Link
-            href="/meeting"
+          <a
+            href="https://meet.google.com/new"
+            target="_blank"
+            rel="noopener noreferrer"
             className="flex-1 btn-primary text-center"
           >
-            Start Meeting Now
+            Start Google Meet
+          </a>
+          <Link
+            href="/meeting"
+            className="flex-none px-4 py-2 border border-[#eae4da] bg-white text-[#1a1a1a] rounded-lg font-semibold text-sm hover:bg-[#faf7f2] transition-colors flex items-center"
+          >
+            Meeting Tools
           </Link>
           <Link
             href="/watchers"

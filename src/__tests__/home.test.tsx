@@ -58,10 +58,16 @@ describe("Home page", () => {
     ).toBeInTheDocument();
   });
 
-  it("renders Start Meeting Now button", () => {
-    const btn = screen.getByText("Start Meeting Now");
+  it("renders Start Google Meet button", () => {
+    const btn = screen.getByText("Start Google Meet");
     expect(btn).toBeInTheDocument();
-    expect(btn.closest("a")).toHaveAttribute("href", "/meeting");
+    expect(btn.closest("a")).toHaveAttribute("href", "https://meet.google.com/new");
+  });
+
+  it("renders Meeting Tools link", () => {
+    const link = screen.getByText("Meeting Tools");
+    expect(link).toBeInTheDocument();
+    expect(link.closest("a")).toHaveAttribute("href", "/meeting");
   });
 
   it("renders Radar section with items", () => {
