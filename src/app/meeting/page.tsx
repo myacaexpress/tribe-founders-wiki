@@ -25,6 +25,13 @@ interface ProcessingResult {
 
 type PageState = "idle" | "recording" | "processing" | "review" | "saving" | "saved" | "briefing" | "error";
 
+// Founder email addresses — used for Google Calendar invite attendees
+const FOUNDER_EMAILS: Record<string, string> = {
+  shawn: "myacaexpress@gmail.com",
+  mark: "mark@myaca.com",       // update if different
+  michael: "michael@myaca.com", // update if different
+};
+
 export default function MeetingPage() {
   const [state, setState] = useState<PageState>("idle");
   const [meetingTitle, setMeetingTitle] = useState("");
@@ -249,15 +256,46 @@ export default function MeetingPage() {
     }
   };
 
+  const buildCalendarUrl = () => {
+    const title = meetingTitle || "Founders Meeting";
+
+    // Build start/end times (now → now + 1 hour) in Google Calendar format
+    const now = new Date();
+    const end = new Date(now.getTime() + 60 * 60 * 1000);
+    const fmt = (d: Date) =>
+      d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+    const dates = `${fmt(now)}/${fmt(end)}`;
+
+    // Collect emails of selected attendees
+    const attendeeEmails = Object.entries(attendees)
+      .filter(([, checked]) => checked)
+      .map(([key]) => FOUNDER_EMAILS[key])
+      .filter(Boolean)
+      .join(",");
+
+    const params = new URLSearchParams({
+      action: "TEMPLATE",
+      text: title,
+      dates,
+      conferenceType: "hangoutsMeet",
+      crm: "BUSY",
+    });
+    if (attendeeEmails) params.set("add", attendeeEmails);
+
+    return `https://calendar.google.com/calendar/render?${params.toString()}`;
+  };
+
   const startMeetingWithRecording = async () => {
-    // Open Google Meet in a new tab
-    window.open("https://meet.google.com/new", "_blank");
-    // Immediately start local mic recording as a companion
+    // Open Google Calendar event creator (pre-filled with title, attendees,
+    // and conferenceType=hangoutsMeet so a Meet link is auto-attached).
+    // The user just taps Save — everyone gets an invite with the Meet link.
+    window.open(buildCalendarUrl(), "_blank");
+    // Simultaneously start local mic recording as a companion
     await startRecording();
   };
 
   const copyMeetUrl = async () => {
-    const urlToCopy = meetUrl || "https://meet.google.com/new";
+    const urlToCopy = meetUrl;
     try {
       await navigator.clipboard.writeText(urlToCopy);
       setMeetUrlCopied(true);
@@ -268,7 +306,7 @@ export default function MeetingPage() {
   };
 
   const getMeetShareLinks = () => {
-    const url = meetUrl || "https://meet.google.com/new";
+    const url = meetUrl;
     const title = meetingTitle || "Founders Meeting";
     const msg = encodeURIComponent(`Join our ${title}: ${url}`);
     return {
@@ -570,37 +608,44 @@ export default function MeetingPage() {
               {/* Meet link sharing */}
               <div className="bg-white rounded-lg border border-[#eae4da] p-4 space-y-3">
                 <p className="text-sm font-medium text-[#1a1a1a]">
-                  Share your Google Meet link
+                  Meet link
+                </p>
+                <p className="text-xs text-[#8a8580]">
+                  After saving the Calendar event, paste your meet.google.com link here to share it.
                 </p>
                 <div className="flex gap-2">
                   <input
                     type="text"
                     value={meetUrl}
                     onChange={(e) => setMeetUrl(e.target.value)}
-                    placeholder="Paste your meet.google.com/xxx link here"
+                    placeholder="meet.google.com/xxx-xxxx-xxx"
                     className="flex-1 px-3 py-2 text-sm border border-[#eae4da] rounded-lg bg-[#faf7f2] text-[#1a1a1a] placeholder-[#8a8580] focus:outline-none focus:border-[#2b8a88]"
                   />
-                  <button
-                    onClick={copyMeetUrl}
-                    className="px-3 py-2 text-sm bg-[#2b8a88] text-white rounded-lg hover:opacity-90 transition-opacity whitespace-nowrap"
-                  >
-                    {meetUrlCopied ? "Copied!" : "Copy"}
-                  </button>
+                  {meetUrl && (
+                    <button
+                      onClick={copyMeetUrl}
+                      className="px-3 py-2 text-sm bg-[#2b8a88] text-white rounded-lg hover:opacity-90 transition-opacity whitespace-nowrap"
+                    >
+                      {meetUrlCopied ? "Copied!" : "Copy"}
+                    </button>
+                  )}
                 </div>
-                <div className="flex gap-2">
-                  <a
-                    href={getMeetShareLinks().mailto}
-                    className="flex-1 py-2 px-3 text-sm text-center border border-[#eae4da] rounded-lg text-[#1a1a1a] hover:bg-[#faf7f2] transition-colors"
-                  >
-                    Share via Email
-                  </a>
-                  <a
-                    href={getMeetShareLinks().imessage}
-                    className="flex-1 py-2 px-3 text-sm text-center border border-[#eae4da] rounded-lg text-[#1a1a1a] hover:bg-[#faf7f2] transition-colors"
-                  >
-                    Share via iMessage
-                  </a>
-                </div>
+                {meetUrl && (
+                  <div className="flex gap-2">
+                    <a
+                      href={getMeetShareLinks().mailto}
+                      className="flex-1 py-2 px-3 text-sm text-center border border-[#eae4da] rounded-lg text-[#1a1a1a] hover:bg-[#faf7f2] transition-colors"
+                    >
+                      Share via Email
+                    </a>
+                    <a
+                      href={getMeetShareLinks().imessage}
+                      className="flex-1 py-2 px-3 text-sm text-center border border-[#eae4da] rounded-lg text-[#1a1a1a] hover:bg-[#faf7f2] transition-colors"
+                    >
+                      Share via iMessage
+                    </a>
+                  </div>
+                )}
               </div>
 
               {/* Stop recording button */}
