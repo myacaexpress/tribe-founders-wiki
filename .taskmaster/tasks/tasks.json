@@ -1,0 +1,178 @@
+{
+  "master": {
+    "tasks": [
+      {
+        "id": 23,
+        "title": "Set up Next.js 14+ project with Tailwind CSS and TriBe brand tokens",
+        "description": "Initialize Next.js 14 App Router project with Tailwind CSS configured using TriBe brand colors and typography",
+        "details": "npx create-next-app@latest tribe-founders-app --typescript --tailwind --eslint --app; Install remark, rehype, gray-matter for markdown processing; Configure tailwind.config.js with brand tokens: background #faf7f2, card #ffffff, border #eae4da, text #1a1a1a/#8a8580, teal #2b8a88, coral #e85d4e, sage #a8b5a0, amber #e8a33d; Set fonts: Georgia for display, system-ui for UI; Mobile-first: max-width 440px container",
+        "testStrategy": "Verify Next.js 14 app router structure, Tailwind classes render correct brand colors, responsive breakpoints work on 320px-440px screens, Georgia font loads for headings",
+        "priority": "high",
+        "dependencies": [],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 24,
+        "title": "Implement password gate middleware with session cookie",
+        "description": "Create Next.js middleware for single shared password authentication across all routes",
+        "details": "Create middleware.ts: intercept all routes except /api/auth; Check httpOnly session cookie; Redirect to /login if invalid; /api/auth POST endpoint validates against process.env.APP_PASSWORD; Set cookie: httpOnly=true, secure=true, sameSite='strict', maxAge=30*24*60*60*1000; Login form: centered React component with TriBe logo, single input, shake animation on wrong password; Founder picker modal after first login stores founder name in separate cookie",
+        "testStrategy": "Test middleware blocks unauth routes, valid password sets cookie, cookie persists 30 days, wrong password shows shake animation, founder picker stores correctly, all routes protected equally",
+        "priority": "high",
+        "dependencies": [
+          23
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 25,
+        "title": "Build Home Screen with card layout and brand styling",
+        "description": "Create mobile-first home screen with vertically stacked cards using TriBe brand system",
+        "details": "page.tsx at root: max-w-[440px] mx-auto; Fixed card order: header(logo+subtitle), state sentence (editable markdown), meeting button, radar card, group table card, lanes card, tasks card, tools grid, wiki link, this week, FAB; Cards: white bg, #eae4da border, 16px radius/padding; FAB: fixed bottom-6 left-1/2 coral circle 56px + icon; Use Tailwind grid/flex for responsive layout; Placeholder data for initial render",
+        "testStrategy": "Verify 440px max-width centers on desktop, cards stack vertically on mobile, FAB fixed bottom-center, all card styles match brand spec, touch targets >=44px",
+        "priority": "high",
+        "dependencies": [
+          23,
+          24
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 26,
+        "title": "Implement markdown wiki renderer with TOC and search",
+        "description": "Create Wikipedia-style markdown renderer for wiki pages with auto-TOC and keyword search",
+        "details": "Install remark@14, rehype@12, gray-matter, remark-toc; Create /wiki/[...path]/page.tsx catch-all route; Read .md file from public/wiki/ + path.join; Parse frontmatter + content; Generate TOC from H2/H3 headings with anchor links; Keyword search: index all wiki .md files on mount, filter by string match, dropdown results with snippets; Styling: Georgia serif H1-H3, system-ui body; At-a-glance box, footer with relative update time",
+        "testStrategy": "Render sample .md files correctly, TOC links jump to sections, search finds matches across files, no raw markdown visible, serif headlines render properly",
+        "priority": "high",
+        "dependencies": [
+          23
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 27,
+        "title": "Develop Add Something bottom sheet with file write",
+        "description": "Build quick-capture bottom sheet that writes timestamped markdown files to founder directories",
+        "details": "Create AddSomethingSheet component: fixed bottom-0 translate-y-full animation; Backdrop overlay; Grabber handle; Large textarea auto-grow; 3 buttons: Lane(teal selected), Brainstorm(coral), Watch Email(sage disabled+Phase2 badge); On save: POST /api/add-content with text+destination; Generate filename YYYY-MM-DD-HH-mm-[slug].md (slug=first5words-kebab); Write to public/founders/[founder]/[lane|brainstorm]/ via fs in API route; Confirmation toast 3s",
+        "testStrategy": "Sheet animates up/down, buttons highlight correctly, disabled button shows Phase2 badge, files written with correct path/timestamp/slug, toast confirms location",
+        "priority": "high",
+        "dependencies": [
+          23,
+          24,
+          25
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 28,
+        "title": "Create GitHub Contents API integration for dynamic reads/writes",
+        "description": "Set up GitHub API client for reading/writing markdown files at runtime (bypassing static build)",
+        "details": "Install octokit; Create GitHub client with PAT from process.env.GITHUB_TOKEN; API routes: /api/read-file?path=..., /api/write-file with content/base64; List directory: /api/list-dir?path=...; Use for Add Something writes, Group Table updates; Fallback to public/ files for SSG; Handle conflicts with etag/branch=main; Rate limit handling with retry; Private repo access only",
+        "testStrategy": "Read existing files return correct content, write creates new files in correct repo path, list-dir returns file tree, handles 404s gracefully, auth works with PAT",
+        "priority": "high",
+        "dependencies": [
+          23
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 29,
+        "title": "Implement Group Table with status lifecycle and decision records",
+        "description": "Build decision tracking system with YAML frontmatter storage and status advancement",
+        "details": "Create /api/group-table CRUD endpoints using GitHub API; Data schema in wiki/group-table.md YAML frontmatter: items[] with id, raised_by, raised_at, title, reason, questions[], prep[], status(raised|discussed|decided|executing|complete), resolution{decision,via,quote,decided_at}; Status tap cycles forward; On resolve: create wiki/decisions/YYYY-MM-DD-[id].md template; Home card shows open items; Prep items in Tasks with dotted styling",
+        "testStrategy": "Status advances correctly, resolution creates decision file, prep items render dotted/light, data persists via GitHub API, lifecycle validation prevents invalid states",
+        "priority": "medium",
+        "dependencies": [
+          23,
+          24,
+          25,
+          28
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 30,
+        "title": "Build Radar component with zone-based urgency sorting",
+        "description": "Create early-warning Radar card that conditionally renders based on populated zones",
+        "details": "Parse wiki/radar.md structured items: zone(red|yellow|sage), title, meta, date, source; Sort: red→yellow→sage; Render only populated zones with colored dots + headers; Return null if all zones empty; Home screen integration reads via GitHub API; Manual add/remove via separate editor (Phase 1); Thresholds from CLAUDE.md doc",
+        "testStrategy": "Empty data = no card render, populated zones show correct order/colors, items match parsed structure, source links work, conditional rendering perfect",
+        "priority": "medium",
+        "dependencies": [
+          23,
+          25,
+          28
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 31,
+        "title": "Develop Founder Lanes and Brainstorm display components",
+        "description": "Create home screen lanes card showing 2-3 active items per founder with color borders",
+        "details": "LanesCard component: 3 equal-height blocks, left 4px color border (teal/shawn, coral/mark, sage/michael); Read latest 2-3 files from founders/[name]/lane/ via GitHub API; Truncate to 1 line + recent marker; Standard lane shape: title,status,why,next,zone,log; Brainstorm pages freeform; Exploring zone items dimmed; Identical sizing prevents comparison",
+        "testStrategy": "3 lanes equal height, correct color borders, shows latest files only, exploring items dimmed, no metrics/scoreboard, responsive grid",
+        "priority": "medium",
+        "dependencies": [
+          23,
+          25,
+          28
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 32,
+        "title": "Implement Meeting Quick-Launch button with deeplinks",
+        "description": "Add one-tap Google Meet creation with clipboard copy and iMessage/email deeplinks",
+        "details": "MeetingButton component: teal gradient full-width; window.open('https://meet.google.com/new'); navigator.clipboard.writeText(meetUrl); Show 'Link copied!' toast 2s; Share buttons: sms://open?addresses=mark@phone,michael@phone (iMessage group), mailto:?subject=TriBe%20Sync&body=meetUrl; Visual confirmation sequence",
+        "testStrategy": "Button opens Meet, copies URL, toast appears, deeplinks open native apps, mobile iMessage deeplink works, error handling for clipboard permission",
+        "priority": "medium",
+        "dependencies": [
+          23,
+          25
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 33,
+        "title": "Set up Vercel deployment with custom domain and environment variables",
+        "description": "Configure Vercel project with app.tribebenefits.com domain and secure env vars",
+        "details": "vercel login; vercel link to GitHub repo tribe-founders-wiki; vercel env add GITHUB_TOKEN APP_PASSWORD; Custom domain app.tribebenefits.com via Vercel dashboard; Auto-deploy on main push; SSG/ISR hybrid: revalidatePath for dynamic pages; Edge middleware for auth; Monitor build/deploy logs",
+        "testStrategy": "Deploy succeeds on git push, domain resolves, env vars loaded (log check), password gate works post-deploy, mobile performance <2s load",
+        "priority": "high",
+        "dependencies": [
+          23,
+          24,
+          28
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 34,
+        "title": "Create seed content and CLAUDE.md schema file",
+        "description": "Populate initial wiki structure with people pages, operations docs, and business rules",
+        "details": "Create directory structure: wiki/, founders/shawn/lane/, founders/mark/lane/, etc; Seed files: shawn.md/mark.md/michael.md (people), licensing.md/tech-stack.md, manifesto-v2.md, radar.md (empty), group-table.md (empty YAML); CLAUDE.md at root: business identity, routing rules, radar thresholds (14/60/90 days), founder colors, tone guide, what NOT to build; Commit to main triggers deploy",
+        "testStrategy": "All seed files render correctly in wiki, CLAUDE.md readable markdown, directory structure matches PRD, radar/group-table parse empty state correctly",
+        "priority": "medium",
+        "dependencies": [
+          26
+        ],
+        "status": "pending",
+        "subtasks": []
+      }
+    ],
+    "metadata": {
+      "created": "2026-04-10T18:42:14.007Z",
+      "updated": "2026-04-10T18:51:41.052Z",
+      "description": "Tasks for master context"
+    }
+  }
+}
