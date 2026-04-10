@@ -44,6 +44,8 @@ export default function MeetingPage() {
   const [processingStep, setProcessingStep] = useState<"transcribing" | "processing">(
     "transcribing"
   );
+  const [meetUrl, setMeetUrl] = useState("");
+  const [meetUrlCopied, setMeetUrlCopied] = useState(false);
 
   // Audio recording refs
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -167,7 +169,7 @@ export default function MeetingPage() {
 
       // Upload to transcription endpoint
       const formData = new FormData();
-      formData.append("audio", audioBlob, "recording.webm");
+      formData.append("file", audioBlob, "recording.webm");
 
       const transcribeResponse = await fetch("/api/meeting/transcribe", {
         method: "POST",
@@ -247,6 +249,34 @@ export default function MeetingPage() {
     }
   };
 
+  const startMeetingWithRecording = async () => {
+    // Open Google Meet in a new tab
+    window.open("https://meet.google.com/new", "_blank");
+    // Immediately start local mic recording as a companion
+    await startRecording();
+  };
+
+  const copyMeetUrl = async () => {
+    const urlToCopy = meetUrl || "https://meet.google.com/new";
+    try {
+      await navigator.clipboard.writeText(urlToCopy);
+      setMeetUrlCopied(true);
+      setTimeout(() => setMeetUrlCopied(false), 2000);
+    } catch {
+      // Fallback: select an input
+    }
+  };
+
+  const getMeetShareLinks = () => {
+    const url = meetUrl || "https://meet.google.com/new";
+    const title = meetingTitle || "Founders Meeting";
+    const msg = encodeURIComponent(`Join our ${title}: ${url}`);
+    return {
+      mailto: `mailto:?subject=${encodeURIComponent(title)}&body=${msg}`,
+      imessage: `sms:&body=${msg}`,
+    };
+  };
+
   const resetForm = () => {
     setMeetingTitle("");
     setAttendees({ shawn: true, mark: true, michael: true });
@@ -257,6 +287,8 @@ export default function MeetingPage() {
     setSaveMessage("");
     setBriefContent("");
     setRecordingTime(0);
+    setMeetUrl("");
+    setMeetUrlCopied(false);
     chunksRef.current = [];
     setState("idle");
   };
@@ -480,14 +512,12 @@ export default function MeetingPage() {
 
               {/* Action buttons */}
               <div className="flex flex-col gap-3">
-                <a
-                  href="https://meet.google.com/new"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <button
+                  onClick={startMeetingWithRecording}
                   className="w-full py-4 px-4 bg-[#2b8a88] text-white rounded-lg font-semibold text-lg hover:opacity-90 transition-opacity text-center"
                 >
-                  Start Google Meet
-                </a>
+                  Start Meeting + Record
+                </button>
                 <button
                   onClick={startRecording}
                   className="w-full py-3 px-4 border-2 border-[#2b8a88] text-[#2b8a88] rounded-lg font-semibold hover:bg-[#f0f8f7] transition-colors"
@@ -509,7 +539,7 @@ export default function MeetingPage() {
         {state === "recording" && (
           <>
             <h1 className="serif-heading text-3xl mb-8 text-[#1a1a1a]">
-              Recording...
+              Meeting in Progress
             </h1>
 
             <div className="space-y-6">
@@ -537,12 +567,48 @@ export default function MeetingPage() {
                 />
               </div>
 
+              {/* Meet link sharing */}
+              <div className="bg-white rounded-lg border border-[#eae4da] p-4 space-y-3">
+                <p className="text-sm font-medium text-[#1a1a1a]">
+                  Share your Google Meet link
+                </p>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={meetUrl}
+                    onChange={(e) => setMeetUrl(e.target.value)}
+                    placeholder="Paste your meet.google.com/xxx link here"
+                    className="flex-1 px-3 py-2 text-sm border border-[#eae4da] rounded-lg bg-[#faf7f2] text-[#1a1a1a] placeholder-[#8a8580] focus:outline-none focus:border-[#2b8a88]"
+                  />
+                  <button
+                    onClick={copyMeetUrl}
+                    className="px-3 py-2 text-sm bg-[#2b8a88] text-white rounded-lg hover:opacity-90 transition-opacity whitespace-nowrap"
+                  >
+                    {meetUrlCopied ? "Copied!" : "Copy"}
+                  </button>
+                </div>
+                <div className="flex gap-2">
+                  <a
+                    href={getMeetShareLinks().mailto}
+                    className="flex-1 py-2 px-3 text-sm text-center border border-[#eae4da] rounded-lg text-[#1a1a1a] hover:bg-[#faf7f2] transition-colors"
+                  >
+                    Share via Email
+                  </a>
+                  <a
+                    href={getMeetShareLinks().imessage}
+                    className="flex-1 py-2 px-3 text-sm text-center border border-[#eae4da] rounded-lg text-[#1a1a1a] hover:bg-[#faf7f2] transition-colors"
+                  >
+                    Share via iMessage
+                  </a>
+                </div>
+              </div>
+
               {/* Stop recording button */}
               <button
                 onClick={stopRecording}
                 className="w-full py-4 px-4 bg-[#e85d4e] text-white rounded-lg font-semibold text-lg hover:opacity-90 transition-opacity"
               >
-                Stop Recording
+                End Meeting & Transcribe
               </button>
             </div>
           </>
