@@ -17,10 +17,13 @@ export interface HomeClientProps {
   businessStateSentence: string;
 }
 
+const SCENIC_BG = "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1080&q=80";
+
 const glass = {
-  background: "rgba(255,255,255,0.12)",
-  backdropFilter: "blur(20px)",
-  WebkitBackdropFilter: "blur(20px)",
+  background: "rgba(255,255,255,0.18)",
+  backdropFilter: "blur(24px)",
+  WebkitBackdropFilter: "blur(24px)",
+  boxShadow: "0 8px 32px rgba(0,0,0,0.25)",
 } as React.CSSProperties;
 
 export default function HomeClient({
@@ -57,7 +60,12 @@ export default function HomeClient({
   return (
     <div
       className="min-h-screen pb-24"
-      style={{ background: "linear-gradient(180deg,#062d2d 0%,#0e6b5c 35%,#c4673a 68%,#5c1f0a 100%)" }}
+      style={{
+        backgroundImage: `linear-gradient(to bottom, rgba(6,45,45,0.75) 0%, rgba(6,45,45,0.5) 40%, rgba(180,80,50,0.55) 80%, rgba(60,20,10,0.8) 100%), url(${SCENIC_BG})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundAttachment: "fixed",
+      }}
     >
       <div className="container-main py-6">
 
@@ -73,7 +81,7 @@ export default function HomeClient({
         </div>
 
         {/* State sentence card */}
-        <div className="rounded-2xl border border-white/20 p-5 mb-4" style={glass}>
+        <div className="rounded-2xl border border-white/30 p-5 mb-4" style={glass}>
           <p className="text-white font-serif text-lg leading-relaxed">
             {businessStateSentence}
           </p>
@@ -92,28 +100,28 @@ export default function HomeClient({
           <Link
             href="/meeting"
             className="flex-none px-3 py-2 border border-white/30 rounded-full font-semibold text-sm text-white hover:bg-white/10 transition-colors"
-            style={{ background: "rgba(255,255,255,0.1)" }}
+            style={{ background: "rgba(255,255,255,0.18)" }}
           >
             Record
           </Link>
           <Link
             href="/watchers"
             className="flex-none px-3 py-2 border border-white/30 rounded-full font-semibold text-sm text-white hover:bg-white/10 transition-colors"
-            style={{ background: "rgba(255,255,255,0.1)" }}
+            style={{ background: "rgba(255,255,255,0.18)" }}
           >
             Watchers
           </Link>
           <Link
             href="/search"
             className="flex-none px-3 py-2 border border-white/30 rounded-full font-semibold text-sm text-white hover:bg-white/10 transition-colors"
-            style={{ background: "rgba(255,255,255,0.1)" }}
+            style={{ background: "rgba(255,255,255,0.18)" }}
           >
             Search
           </Link>
         </div>
 
         {/* Radar card */}
-        <div className="rounded-2xl border border-white/20 p-5 mb-4" style={glass}>
+        <div className="rounded-2xl border border-white/30 p-5 mb-4" style={glass}>
           <h2 className="serif-heading text-lg mb-4 text-white font-bold">Radar</h2>
           <div className="space-y-3">
             {radarItems.map((item) => (
@@ -145,7 +153,7 @@ export default function HomeClient({
         </div>
 
         {/* Group Table card */}
-        <div className="rounded-2xl border border-white/20 p-5 mb-4" style={glass}>
+        <div className="rounded-2xl border border-white/30 p-5 mb-4" style={glass}>
           <h2 className="serif-heading text-lg mb-4 text-white font-bold">Group Table</h2>
           <div className="space-y-3">
             {groupTableItems.map((item) => (
@@ -163,7 +171,7 @@ export default function HomeClient({
         </div>
 
         {/* Lanes card */}
-        <div className="rounded-2xl border border-white/20 p-5 mb-4" style={glass}>
+        <div className="rounded-2xl border border-white/30 p-5 mb-4" style={glass}>
           <h2 className="serif-heading text-lg mb-4 text-white font-bold">Lanes</h2>
           <div className="space-y-4">
             <div>
@@ -203,7 +211,7 @@ export default function HomeClient({
         </div>
 
         {/* Tasks card */}
-        <div className="rounded-2xl border border-white/20 p-5 mb-4" style={glass}>
+        <div className="rounded-2xl border border-white/30 p-5 mb-4" style={glass}>
           <h2 className="serif-heading text-lg mb-4 text-white font-bold">Tasks</h2>
           <div className="mb-4 flex gap-2 border-b border-white/20">
             <button
@@ -232,7 +240,7 @@ export default function HomeClient({
               <div
                 key={task.id}
                 className="flex items-center gap-3 p-3 rounded-xl"
-                style={{ background: "rgba(255,255,255,0.08)" }}
+                style={{ background: "rgba(255,255,255,0.15)" }}
               >
                 <input
                   type="checkbox"
@@ -252,13 +260,13 @@ export default function HomeClient({
         <Link
           href="/wiki"
           className="block w-full text-center py-3 px-4 border border-white/30 rounded-full text-white font-semibold hover:bg-white/10 transition-colors mb-4"
-          style={{ background: "rgba(255,255,255,0.08)" }}
+          style={{ background: "rgba(255,255,255,0.15)" }}
         >
           Open Full Wiki
         </Link>
 
         {/* This Week timeline card */}
-        <div className="rounded-2xl border border-white/20 p-5" style={glass}>
+        <div className="rounded-2xl border border-white/30 p-5" style={glass}>
           <h2 className="serif-heading text-lg mb-4 text-white font-bold">This Week</h2>
           <div className="relative pl-6">
             <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-white/20" />

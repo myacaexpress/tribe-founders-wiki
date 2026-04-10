@@ -431,16 +431,24 @@ export default function MeetingPage() {
     }
   };
 
+  const SCENIC_BG = "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1080&q=80";
+
   const glassStyle = {
-    background: "rgba(255,255,255,0.12)",
-    backdropFilter: "blur(20px)",
-    WebkitBackdropFilter: "blur(20px)",
+    background: "rgba(255,255,255,0.18)",
+    backdropFilter: "blur(24px)",
+    WebkitBackdropFilter: "blur(24px)",
+    boxShadow: "0 8px 32px rgba(0,0,0,0.25)",
   } as React.CSSProperties;
 
   return (
     <div
       className="min-h-screen pb-24"
-      style={{ background: "linear-gradient(180deg,#062d2d 0%,#0e6b5c 35%,#c4673a 68%,#5c1f0a 100%)" }}
+      style={{
+        backgroundImage: `linear-gradient(to bottom, rgba(6,45,45,0.75) 0%, rgba(6,45,45,0.5) 40%, rgba(180,80,50,0.55) 80%, rgba(60,20,10,0.8) 100%), url(${SCENIC_BG})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundAttachment: "fixed",
+      }}
     >
       <div className="container-main py-6">
 
@@ -465,7 +473,7 @@ export default function MeetingPage() {
 
             <div className="space-y-5">
               {/* Meeting title input */}
-              <div className="rounded-2xl border border-white/20 p-5" style={glassStyle}>
+              <div className="rounded-2xl border border-white/30 p-5" style={glassStyle}>
                 <label className="block text-sm font-medium text-white/80 mb-2">
                   Meeting Title (optional)
                 </label>
@@ -479,7 +487,7 @@ export default function MeetingPage() {
               </div>
 
               {/* Attendees checkboxes */}
-              <div className="rounded-2xl border border-white/20 p-5" style={glassStyle}>
+              <div className="rounded-2xl border border-white/30 p-5" style={glassStyle}>
                 <label className="block text-sm font-medium text-white/80 mb-3">
                   Attendees
                 </label>
@@ -513,14 +521,14 @@ export default function MeetingPage() {
                 <button
                   onClick={startRecording}
                   className="w-full py-3 px-6 border border-white/30 text-white rounded-full font-semibold hover:bg-white/10 transition-colors"
-                  style={{ background: "rgba(255,255,255,0.08)" }}
+                  style={{ background: "rgba(255,255,255,0.15)" }}
                 >
                   Record Audio Only
                 </button>
                 <button
                   onClick={generateBrief}
                   className="w-full py-3 px-6 border border-white/20 text-white/70 rounded-full font-semibold hover:bg-white/10 transition-colors"
-                  style={{ background: "rgba(255,255,255,0.05)" }}
+                  style={{ background: "rgba(255,255,255,0.10)" }}
                 >
                   Generate Pre-Meeting Brief
                 </button>
@@ -538,7 +546,7 @@ export default function MeetingPage() {
 
             <div className="space-y-5">
               {/* Recording indicator + timer */}
-              <div className="rounded-2xl border border-white/20 p-6 text-center" style={glassStyle}>
+              <div className="rounded-2xl border border-white/30 p-6 text-center" style={glassStyle}>
                 <div className="flex items-center justify-center gap-3 mb-3">
                   <div className="w-3 h-3 bg-[#e85d4e] rounded-full animate-pulse" />
                   <span className="text-[#ff7b6b] font-semibold tracking-wide">RECORDING</span>
@@ -560,7 +568,7 @@ export default function MeetingPage() {
               </div>
 
               {/* Google Meet */}
-              <div className="rounded-2xl border border-white/20 p-5 space-y-3" style={glassStyle}>
+              <div className="rounded-2xl border border-white/30 p-5 space-y-3" style={glassStyle}>
                 <a
                   href="https://meet.google.com/new"
                   target="_blank"
@@ -656,7 +664,7 @@ export default function MeetingPage() {
               Pre-Meeting Brief
             </h1>
             <div className="space-y-5">
-              <div className="rounded-2xl border border-white/20 p-6" style={glassStyle}>
+              <div className="rounded-2xl border border-white/30 p-6" style={glassStyle}>
                 <div className="prose prose-sm max-w-none">
                   {briefContent.split("\n").map((line, i) => {
                     if (line.startsWith("# "))
@@ -698,7 +706,7 @@ export default function MeetingPage() {
                 <button
                   onClick={resetForm}
                   className="w-full py-3 px-6 border border-white/30 text-white rounded-full font-semibold hover:bg-white/10 transition-colors"
-                  style={{ background: "rgba(255,255,255,0.08)" }}
+                  style={{ background: "rgba(255,255,255,0.15)" }}
                 >
                   Back
                 </button>
@@ -738,7 +746,7 @@ export default function MeetingPage() {
             <div className="space-y-6">
               {/* Confirm All banner */}
               {reviewItems.some((i) => i.status === "pending") && (
-                <div className="flex items-center justify-between rounded-2xl border border-white/20 p-4" style={glassStyle}>
+                <div className="flex items-center justify-between rounded-2xl border border-white/30 p-4" style={glassStyle}>
                   <div>
                     <p className="text-sm font-medium text-white">
                       {reviewItems.filter((i) => i.status === "pending").length} item{reviewItems.filter((i) => i.status === "pending").length !== 1 ? "s" : ""} pending
@@ -886,7 +894,7 @@ export default function MeetingPage() {
               })}
 
               {/* Collapsible transcript */}
-              <details className="rounded-2xl border border-white/20 overflow-hidden" style={glassStyle}>
+              <details className="rounded-2xl border border-white/30 overflow-hidden" style={glassStyle}>
                 <summary className="p-4 cursor-pointer text-sm font-medium text-white/50 hover:text-white transition-colors">
                   View Full Transcript
                 </summary>
@@ -910,7 +918,7 @@ export default function MeetingPage() {
                 <button
                   onClick={resetForm}
                   className="w-full py-3 px-6 border border-white/30 text-white rounded-full font-semibold hover:bg-white/10 transition-colors"
-                  style={{ background: "rgba(255,255,255,0.08)" }}
+                  style={{ background: "rgba(255,255,255,0.15)" }}
                 >
                   Discard &amp; Start Over
                 </button>
@@ -951,7 +959,7 @@ export default function MeetingPage() {
                 <button
                   onClick={resetForm}
                   className="w-full py-3 px-6 border border-white/30 text-white rounded-full font-semibold hover:bg-white/10 transition-colors"
-                  style={{ background: "rgba(255,255,255,0.08)" }}
+                  style={{ background: "rgba(255,255,255,0.15)" }}
                 >
                   Record Another Meeting
                 </button>
