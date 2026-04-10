@@ -337,9 +337,17 @@ ${responseText}
       }
     }
 
+    // Map items to frontend format (text -> content)
+    const frontendItems = items.map((item) => ({
+      type: item.type,
+      content: item.text,
+      owner: item.owner || item.speaker,
+      confidence: item.confidence,
+    }));
+
     return NextResponse.json({
       success: true,
-      items,
+      items: frontendItems,
       summary,
     });
   } catch (error) {

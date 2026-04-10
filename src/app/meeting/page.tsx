@@ -4,16 +4,26 @@ import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 
 interface ExtractedItem {
-  type: "task" | "decision" | "idea";
+  type: "task" | "decision" | "idea" | "question";
   content: string;
+  owner?: string;
+  confidence?: "high" | "medium";
+}
+
+interface ReviewItem extends ExtractedItem {
+  status: "pending" | "confirmed" | "skipped";
+  editedContent?: string;
+  editedOwner?: string;
+  isEditing?: boolean;
 }
 
 interface ProcessingResult {
   transcript: string;
   items: ExtractedItem[];
+  summary?: string;
 }
 
-type PageState = "idle" | "recording" | "processing" | "done" | "error";
+type PageState = "idle" | "recording" | "processing" | "review" | "saving" | "saved" | "error";
 
 export default function MeetingPage() {
   const [state, setState] = useState<PageState>("idle");
@@ -26,8 +36,10 @@ export default function MeetingPage() {
 
   const [recordingTime, setRecordingTime] = useState(0);
   const [transcript, setTranscript] = useState("");
-  const [items, setItems] = useState<ExtractedItem[]>([]);
+  const [summary, setSummary] = useState("");
+  const [reviewItems, setReviewItems] = useState<ReviewItem[]>([]);
   const [errorMessage, setErrorMessage] = useState("");
+  const [saveMessage, setSaveMessage] = useState("");
   const [processingStep, setProcessingStep] = useState<"transcribing" | "processing">(
     "transcribing"
   );
@@ -188,8 +200,14 @@ export default function MeetingPage() {
       }
 
       const processData: ProcessingResult = await processResponse.json();
-      setItems(processData.items || []);
-      setState("done");
+      setSummary(processData.summary || "");
+      // Convert extracted items to review items
+      const mapped: ReviewItem[] = (processData.items || []).map((item) => ({
+        ...item,
+        status: "pending" as const,
+      }));
+      setReviewItems(mapped);
+      setState("review");
     } catch (error) {
       console.error("Error processing recording:", error);
       setErrorMessage(
@@ -210,11 +228,93 @@ export default function MeetingPage() {
     setMeetingTitle("");
     setAttendees({ shawn: true, mark: true, michael: true });
     setTranscript("");
-    setItems([]);
+    setSummary("");
+    setReviewItems([]);
     setErrorMessage("");
+    setSaveMessage("");
     setRecordingTime(0);
     chunksRef.current = [];
     setState("idle");
+  };
+
+  // --- Review screen helpers ---
+
+  const updateReviewItem = (index: number, updates: Partial<ReviewItem>) => {
+    setReviewItems((prev) =>
+      prev.map((item, i) => (i === index ? { ...item, ...updates } : item))
+    );
+  };
+
+  const confirmItem = (index: number) => {
+    updateReviewItem(index, { status: "confirmed", isEditing: false });
+  };
+
+  const skipItem = (index: number) => {
+    updateReviewItem(index, { status: "skipped", isEditing: false });
+  };
+
+  const toggleEdit = (index: number) => {
+    const item = reviewItems[index];
+    updateReviewItem(index, {
+      isEditing: !item.isEditing,
+      editedContent: item.editedContent ?? item.content,
+      editedOwner: item.editedOwner ?? item.owner ?? "",
+    });
+  };
+
+  const confirmAll = () => {
+    setReviewItems((prev) =>
+      prev.map((item) =>
+        item.status === "pending" ? { ...item, status: "confirmed" } : item
+      )
+    );
+  };
+
+  const saveConfirmed = async () => {
+    const confirmed = reviewItems.filter((item) => item.status === "confirmed");
+    if (confirmed.length === 0) return;
+
+    setState("saving");
+
+    try {
+      const payload = {
+        items: confirmed.map((item) => ({
+          type: item.type,
+          text: item.editedContent || item.content,
+          owner: item.editedOwner || item.owner,
+          confidence: item.confidence,
+        })),
+        meetingTitle: meetingTitle || `Meeting ${new Date().toISOString().split("T")[0]}`,
+        meetingDate: new Date().toISOString().split("T")[0],
+      };
+
+      const response = await fetch("/api/meeting/confirm", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save items");
+      }
+
+      const data = await response.json();
+      const saved = data.saved;
+      const parts: string[] = [];
+      if (saved.tasks > 0) parts.push(`${saved.tasks} task${saved.tasks > 1 ? "s" : ""}`);
+      if (saved.decisions > 0) parts.push(`${saved.decisions} decision${saved.decisions > 1 ? "s" : ""}`);
+      if (saved.ideas > 0) parts.push(`${saved.ideas} idea${saved.ideas > 1 ? "s" : ""}`);
+      if (saved.questions > 0) parts.push(`${saved.questions} question${saved.questions > 1 ? "s" : ""}`);
+
+      setSaveMessage(`Saved ${parts.join(", ")} to the wiki.`);
+      setState("saved");
+    } catch (error) {
+      console.error("Error saving items:", error);
+      setErrorMessage(
+        error instanceof Error ? error.message : "Failed to save items"
+      );
+      setState("error");
+    }
   };
 
   const drawWaveform = () => {
@@ -451,68 +551,276 @@ export default function MeetingPage() {
           </>
         )}
 
-        {/* DONE STATE */}
-        {state === "done" && (
+        {/* REVIEW STATE */}
+        {state === "review" && (
           <>
-            <h1 className="serif-heading text-3xl mb-8 text-[#1a1a1a]">
-              Meeting Recorded
+            <h1 className="serif-heading text-3xl mb-2 text-[#1a1a1a]">
+              Review Meeting Items
             </h1>
+            {summary && (
+              <p className="text-[#8a8580] text-sm mb-6">{summary}</p>
+            )}
 
             <div className="space-y-6">
-              {/* Transcript section */}
-              <div className="card">
-                <h2 className="serif-heading text-lg mb-4 text-[#1a1a1a]">
-                  Transcript
-                </h2>
-                <p className="text-[#1a1a1a] leading-relaxed whitespace-pre-wrap text-sm">
-                  {transcript}
-                </p>
-              </div>
-
-              {/* Items section */}
-              {items.length > 0 && (
-                <div className="card">
-                  <h2 className="serif-heading text-lg mb-4 text-[#1a1a1a]">
-                    Extracted Items
-                  </h2>
-
-                  <div className="space-y-3">
-                    {items.map((item, index) => (
-                      <div
-                        key={index}
-                        className={`p-4 rounded-lg ${getItemColor(
-                          item.type
-                        )}`}
-                      >
-                        <div className="flex items-start gap-3">
-                          <span
-                            className={`text-xs font-bold px-2 py-1 rounded ${getItemBadgeColor(
-                              item.type
-                            )} flex-shrink-0 mt-0.5`}
-                          >
-                            {item.type.charAt(0).toUpperCase() +
-                              item.type.slice(1)}
-                          </span>
-                          <p className="text-sm font-medium flex-1">
-                            {item.content}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
+              {/* Confirm All banner */}
+              {reviewItems.some((i) => i.status === "pending") && (
+                <div className="flex items-center justify-between bg-white border border-[#eae4da] rounded-lg p-4">
+                  <div>
+                    <p className="text-sm font-medium text-[#1a1a1a]">
+                      {reviewItems.filter((i) => i.status === "pending").length} item{reviewItems.filter((i) => i.status === "pending").length !== 1 ? "s" : ""} pending review
+                    </p>
+                    <p className="text-xs text-[#8a8580]">
+                      {reviewItems.filter((i) => i.status === "confirmed").length} confirmed, {reviewItems.filter((i) => i.status === "skipped").length} skipped
+                    </p>
                   </div>
+                  <button
+                    onClick={confirmAll}
+                    className="px-4 py-2 bg-[#2b8a88] text-white text-sm font-semibold rounded-lg hover:opacity-90 transition-opacity"
+                  >
+                    Confirm All
+                  </button>
                 </div>
               )}
 
-              {/* Action buttons */}
+              {/* Item cards grouped by type */}
+              {(["task", "decision", "idea", "question"] as const).map((type) => {
+                const typeItems = reviewItems
+                  .map((item, idx) => ({ item, idx }))
+                  .filter(({ item }) => item.type === type);
+
+                if (typeItems.length === 0) return null;
+
+                return (
+                  <div key={type}>
+                    <h2 className="serif-heading text-lg mb-3 text-[#1a1a1a] capitalize">
+                      {type === "question" ? "Open Questions" : `${type}s`}
+                    </h2>
+                    <div className="space-y-3">
+                      {typeItems.map(({ item, idx }) => (
+                        <div
+                          key={idx}
+                          className={`rounded-lg border transition-all ${
+                            item.status === "confirmed"
+                              ? "border-[#2b8a88] bg-[#f0f8f7]"
+                              : item.status === "skipped"
+                              ? "border-[#eae4da] bg-[#f5f4f2] opacity-60"
+                              : "border-[#eae4da] bg-white"
+                          }`}
+                        >
+                          <div className="p-4">
+                            <div className="flex items-start gap-3">
+                              {/* Status indicator */}
+                              <div className="flex-shrink-0 mt-1">
+                                {item.status === "confirmed" ? (
+                                  <span className="inline-flex items-center justify-center w-5 h-5 bg-[#2b8a88] rounded-full text-white text-xs">
+                                    &#10003;
+                                  </span>
+                                ) : item.status === "skipped" ? (
+                                  <span className="inline-flex items-center justify-center w-5 h-5 bg-[#8a8580] rounded-full text-white text-xs">
+                                    &#8212;
+                                  </span>
+                                ) : (
+                                  <span className="inline-flex items-center justify-center w-5 h-5 border-2 border-[#eae4da] rounded-full" />
+                                )}
+                              </div>
+
+                              {/* Content */}
+                              <div className="flex-1 min-w-0">
+                                {item.isEditing ? (
+                                  <div className="space-y-2">
+                                    <textarea
+                                      value={item.editedContent ?? item.content}
+                                      onChange={(e) =>
+                                        updateReviewItem(idx, {
+                                          editedContent: e.target.value,
+                                        })
+                                      }
+                                      rows={2}
+                                      className="w-full px-3 py-2 border border-[#eae4da] rounded-lg bg-white text-[#1a1a1a] text-sm focus:outline-none focus:border-[#2b8a88] focus:ring-1 focus:ring-[#2b8a88]"
+                                    />
+                                    {(item.type === "task" || item.type === "idea") && (
+                                      <div className="flex items-center gap-2">
+                                        <label className="text-xs text-[#8a8580]">
+                                          {item.type === "task" ? "Owner:" : "Speaker:"}
+                                        </label>
+                                        <select
+                                          value={item.editedOwner ?? item.owner ?? ""}
+                                          onChange={(e) =>
+                                            updateReviewItem(idx, {
+                                              editedOwner: e.target.value,
+                                            })
+                                          }
+                                          className="px-2 py-1 border border-[#eae4da] rounded text-sm bg-white text-[#1a1a1a]"
+                                        >
+                                          <option value="">Unassigned</option>
+                                          <option value="shawn">Shawn</option>
+                                          <option value="mark">Mark</option>
+                                          <option value="michael">Michael</option>
+                                        </select>
+                                      </div>
+                                    )}
+                                  </div>
+                                ) : (
+                                  <>
+                                    <p className={`text-sm font-medium ${
+                                      item.status === "skipped"
+                                        ? "text-[#8a8580] line-through"
+                                        : "text-[#1a1a1a]"
+                                    }`}>
+                                      {item.editedContent || item.content}
+                                    </p>
+                                    {(item.owner || item.editedOwner) && (
+                                      <p className="text-xs text-[#8a8580] mt-1">
+                                        {item.type === "task" ? "Owner" : "Speaker"}:{" "}
+                                        <span className="capitalize">
+                                          {item.editedOwner || item.owner}
+                                        </span>
+                                      </p>
+                                    )}
+                                    {item.confidence && (
+                                      <span
+                                        className={`inline-block text-xs px-1.5 py-0.5 rounded mt-1 ${
+                                          item.confidence === "high"
+                                            ? "bg-[#f0f8f7] text-[#2b8a88]"
+                                            : "bg-[#fef9f0] text-[#e8a33d]"
+                                        }`}
+                                      >
+                                        {item.confidence} confidence
+                                      </span>
+                                    )}
+                                  </>
+                                )}
+                              </div>
+
+                              {/* Badge */}
+                              <span
+                                className={`text-xs font-bold px-2 py-1 rounded flex-shrink-0 ${getItemBadgeColor(
+                                  item.type
+                                )}`}
+                              >
+                                {item.type.charAt(0).toUpperCase() +
+                                  item.type.slice(1)}
+                              </span>
+                            </div>
+
+                            {/* Action buttons */}
+                            {item.status !== "confirmed" && item.status !== "skipped" && (
+                              <div className="flex items-center gap-2 mt-3 ml-8">
+                                <button
+                                  onClick={() => confirmItem(idx)}
+                                  className="px-3 py-1.5 bg-[#2b8a88] text-white text-xs font-semibold rounded hover:opacity-90 transition-opacity"
+                                >
+                                  Confirm
+                                </button>
+                                <button
+                                  onClick={() => toggleEdit(idx)}
+                                  className="px-3 py-1.5 border border-[#eae4da] text-[#1a1a1a] text-xs font-semibold rounded hover:bg-[#faf7f2] transition-colors"
+                                >
+                                  {item.isEditing ? "Done Editing" : "Edit"}
+                                </button>
+                                <button
+                                  onClick={() => skipItem(idx)}
+                                  className="px-3 py-1.5 text-[#8a8580] text-xs font-semibold rounded hover:bg-[#f5f4f2] transition-colors"
+                                >
+                                  Skip
+                                </button>
+                              </div>
+                            )}
+
+                            {/* Undo for confirmed/skipped */}
+                            {(item.status === "confirmed" || item.status === "skipped") && (
+                              <div className="mt-2 ml-8">
+                                <button
+                                  onClick={() => updateReviewItem(idx, { status: "pending" })}
+                                  className="text-xs text-[#8a8580] hover:text-[#1a1a1a] transition-colors"
+                                >
+                                  Undo
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+
+              {/* Collapsible transcript */}
+              <details className="bg-white border border-[#eae4da] rounded-lg">
+                <summary className="p-4 cursor-pointer text-sm font-medium text-[#8a8580] hover:text-[#1a1a1a] transition-colors">
+                  View Full Transcript
+                </summary>
+                <div className="px-4 pb-4">
+                  <p className="text-[#1a1a1a] leading-relaxed whitespace-pre-wrap text-xs">
+                    {transcript}
+                  </p>
+                </div>
+              </details>
+
+              {/* Save / Reset buttons */}
               <div className="flex flex-col gap-3">
-                <button className="w-full py-3 px-4 bg-[#2b8a88] text-white rounded-lg font-semibold hover:opacity-90 transition-opacity">
-                  Save to Wiki
-                </button>
+                {reviewItems.some((i) => i.status === "confirmed") && (
+                  <button
+                    onClick={saveConfirmed}
+                    className="w-full py-3 px-4 bg-[#2b8a88] text-white rounded-lg font-semibold hover:opacity-90 transition-opacity"
+                  >
+                    Save {reviewItems.filter((i) => i.status === "confirmed").length} Confirmed Item{reviewItems.filter((i) => i.status === "confirmed").length !== 1 ? "s" : ""} to Wiki
+                  </button>
+                )}
                 <button
                   onClick={resetForm}
                   className="w-full py-3 px-4 border border-[#eae4da] bg-white text-[#1a1a1a] rounded-lg font-semibold hover:bg-[#faf7f2] transition-colors"
                 >
-                  Start New Recording
+                  Discard &amp; Start Over
+                </button>
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* SAVING STATE */}
+        {state === "saving" && (
+          <>
+            <h1 className="serif-heading text-3xl mb-8 text-[#1a1a1a]">
+              Saving to Wiki
+            </h1>
+            <div className="space-y-6 flex flex-col items-center justify-center min-h-[400px]">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#2b8a88]" />
+              <p className="text-lg text-[#1a1a1a] font-medium">
+                Writing items to the wiki...
+              </p>
+            </div>
+          </>
+        )}
+
+        {/* SAVED STATE */}
+        {state === "saved" && (
+          <>
+            <h1 className="serif-heading text-3xl mb-8 text-[#1a1a1a]">
+              Meeting Complete
+            </h1>
+            <div className="space-y-6">
+              <div className="bg-[#f0f8f7] border border-[#2b8a88] rounded-lg p-6 text-center">
+                <div className="text-4xl mb-3">&#10003;</div>
+                <p className="text-[#2b8a88] font-semibold text-lg">{saveMessage}</p>
+                <p className="text-[#8a8580] text-sm mt-2">
+                  Items have been committed to your GitHub wiki.
+                </p>
+              </div>
+
+              <div className="flex flex-col gap-3">
+                <Link
+                  href="/"
+                  className="w-full py-3 px-4 bg-[#2b8a88] text-white rounded-lg font-semibold hover:opacity-90 transition-opacity text-center"
+                >
+                  Back to Home
+                </Link>
+                <button
+                  onClick={resetForm}
+                  className="w-full py-3 px-4 border border-[#eae4da] bg-white text-[#1a1a1a] rounded-lg font-semibold hover:bg-[#faf7f2] transition-colors"
+                >
+                  Record Another Meeting
                 </button>
               </div>
             </div>
