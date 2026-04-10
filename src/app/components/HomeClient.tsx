@@ -93,6 +93,12 @@ export default function HomeClient({
           >
             Watchers
           </Link>
+          <Link
+            href="/search"
+            className="flex-none px-4 py-2 border border-[#eae4da] bg-white text-[#1a1a1a] rounded-lg font-semibold text-sm hover:bg-[#faf7f2] transition-colors flex items-center"
+          >
+            Search
+          </Link>
         </div>
 
         {/* Radar card */}
