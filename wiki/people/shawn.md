@@ -2,7 +2,7 @@
 
 **Role:** Co-founder — Tech, EDE lead, partnership development
 **Color:** Teal (#2b8a88)
-**Email:** myacaexpress@gmail.com
+**Email:** shawn@myacaexpress.com
 
 ## Current Focus
 - Leading tech stack decisions and app development
@@ -11,7 +11,7 @@
 - Business formation (Trifecta Benefits LLC)
 
 ## Contact
-- Personal: myacaexpress@gmail.com
+- Personal: shawn@myacaexpress.com
 - Business: trifectabenefits@proton.me
 
 ## Notes

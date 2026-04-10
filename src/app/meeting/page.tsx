@@ -27,7 +27,7 @@ type PageState = "idle" | "recording" | "processing" | "review" | "saving" | "sa
 
 // Founder email addresses — used for Google Calendar invite attendees
 const FOUNDER_EMAILS: Record<string, string> = {
-  shawn: "myacaexpress@gmail.com",
+  shawn: "shawn@myacaexpress.com",
   mark: "mark@myaca.com",       // update if different
   michael: "michael@myaca.com", // update if different
 };
