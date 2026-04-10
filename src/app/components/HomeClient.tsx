@@ -18,10 +18,10 @@ export interface HomeClientProps {
 }
 
 const glass = {
-  background: "rgba(255,255,255,0.22)",
-  backdropFilter: "blur(28px)",
-  WebkitBackdropFilter: "blur(28px)",
-  boxShadow: "0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.2)",
+  background: "rgba(255,255,255,0.14)",
+  backdropFilter: "blur(32px)",
+  WebkitBackdropFilter: "blur(32px)",
+  boxShadow: "0 4px 24px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.15)",
   borderRadius: "20px",
 } as React.CSSProperties;
 
@@ -58,9 +58,10 @@ export default function HomeClient({
 
   return (
     <div
-      className="min-h-screen pb-24 px-5"
+      className="pb-24 px-5"
       style={{
-        backgroundImage: `linear-gradient(175deg, rgba(10,46,56,0.82) 0%, rgba(26,74,74,0.72) 25%, rgba(45,107,90,0.6) 40%, rgba(199,106,74,0.65) 65%, rgba(232,149,106,0.5) 80%, rgba(42,26,46,0.85) 100%), url('/bg-sunset.jpg')`,
+        minHeight: "100vh",
+        backgroundImage: `linear-gradient(175deg, rgba(10,46,56,0.9) 0%, rgba(26,74,74,0.8) 25%, rgba(45,107,90,0.7) 40%, rgba(199,106,74,0.7) 65%, rgba(232,149,106,0.6) 80%, rgba(42,26,46,0.92) 100%), url('/bg-sunset.jpg')`,
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundAttachment: "fixed",
@@ -80,7 +81,7 @@ export default function HomeClient({
         </div>
 
         {/* State sentence card */}
-        <div className="border border-white/35 p-6" style={glass}>
+        <div className="border border-white/25 p-6" style={glass}>
           <p className="text-white font-serif text-lg leading-relaxed">
             {businessStateSentence}
           </p>
@@ -105,7 +106,7 @@ export default function HomeClient({
             <Link
               key={href}
               href={href}
-              className="flex-none px-5 py-2.5 border border-white/35 rounded-full font-semibold text-sm text-white whitespace-nowrap hover:bg-white/20 transition-colors"
+              className="flex-none px-5 py-2.5 border border-white/25 rounded-full font-semibold text-sm text-white whitespace-nowrap hover:bg-white/20 transition-colors"
               style={{ background: "rgba(255,255,255,0.18)" }}
             >
               {label}
@@ -114,7 +115,7 @@ export default function HomeClient({
         </div>
 
         {/* Radar card — each item is its own mini card */}
-        <div className="border border-white/35 p-6" style={glass}>
+        <div className="border border-white/25 p-6" style={glass}>
           <h2 className="serif-heading text-xl mb-4 text-white font-bold">Radar</h2>
           <div className="space-y-3">
             {radarItems.map((item) => (
@@ -145,7 +146,7 @@ export default function HomeClient({
         </div>
 
         {/* Group Table card */}
-        <div className="border border-white/35 p-6" style={glass}>
+        <div className="border border-white/25 p-6" style={glass}>
           <h2 className="serif-heading text-xl mb-4 text-white font-bold">Group Table</h2>
           <div className="space-y-3">
             {groupTableItems.map((item) => (
@@ -167,7 +168,7 @@ export default function HomeClient({
         </div>
 
         {/* Lanes card */}
-        <div className="border border-white/35 p-6" style={glass}>
+        <div className="border border-white/25 p-6" style={glass}>
           <h2 className="serif-heading text-xl mb-4 text-white font-bold">Lanes</h2>
           <div className="space-y-5">
             {[
@@ -191,7 +192,7 @@ export default function HomeClient({
         </div>
 
         {/* Tasks card */}
-        <div className="border border-white/35 p-6" style={glass}>
+        <div className="border border-white/25 p-6" style={glass}>
           <h2 className="serif-heading text-xl mb-4 text-white font-bold">Tasks</h2>
           {/* Tab row — pill buttons, scrollable */}
           <div className="flex gap-2 mb-4 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
@@ -224,7 +225,7 @@ export default function HomeClient({
         </div>
 
         {/* This Week timeline card */}
-        <div className="border border-white/35 p-6" style={glass}>
+        <div className="border border-white/25 p-6" style={glass}>
           <h2 className="serif-heading text-xl mb-4 text-white font-bold">This Week</h2>
           <div className="relative pl-6">
             <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-white/20" />

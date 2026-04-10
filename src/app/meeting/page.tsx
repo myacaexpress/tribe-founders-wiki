@@ -23,7 +23,7 @@ interface ProcessingResult {
   summary?: string;
 }
 
-type PageState = "idle" | "recording" | "processing" | "review" | "saving" | "saved" | "briefing" | "error";
+type PageState = "idle" | "requesting" | "recording" | "processing" | "review" | "saving" | "saved" | "briefing" | "error";
 
 // Founder email addresses — used for Google Calendar invite attendees
 const FOUNDER_EMAILS: Record<string, string> = {
@@ -61,6 +61,7 @@ export default function MeetingPage() {
   const chunksRef = useRef<Blob[]>([]);
   const timerIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const animationFrameRef = useRef<number | null>(null);
+  const isRecordingRef = useRef(false); // avoid closure issues in animation loop
 
   // Waveform visualization
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -69,7 +70,11 @@ export default function MeetingPage() {
   const startRecording = async () => {
     try {
       setErrorMessage("");
+      setState("requesting");
+      console.log("[Recording] Requesting microphone access...");
+
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      console.log("[Recording] Microphone access granted");
 
       // Set up audio context for visualization
       const audioContext = new (window.AudioContext ||
@@ -85,47 +90,71 @@ export default function MeetingPage() {
 
       // Initialize waveform data
       const bufferLength = analyser.frequencyBinCount;
-      const frequencyData = new Uint8Array(bufferLength);
-      waveformDataRef.current = frequencyData as any;
+      waveformDataRef.current = new Uint8Array(bufferLength) as any;
 
-      // Start visualization
-      const visualize = () => {
-        if (analyserRef.current && canvasRef.current && state === "recording") {
-          const data = waveformDataRef.current as any;
-          if (data) {
-            analyserRef.current.getByteFrequencyData(data);
-            drawWaveform();
-          }
-          animationFrameRef.current = requestAnimationFrame(visualize);
-        }
-      };
-      visualize();
+      // Pick best supported mime type (Safari needs audio/mp4, Firefox needs audio/ogg)
+      const mimeType =
+        ["audio/webm;codecs=opus", "audio/webm", "audio/mp4", "audio/ogg"]
+          .find((t) => MediaRecorder.isTypeSupported(t)) ?? "";
+      console.log("[Recording] Using mimeType:", mimeType || "(browser default)");
 
       // Set up media recorder
-      const mediaRecorder = new MediaRecorder(stream, {
-        mimeType: "audio/webm",
-      });
+      const mediaRecorder = new MediaRecorder(
+        stream,
+        mimeType ? { mimeType } : {}
+      );
 
       mediaRecorder.ondataavailable = (event) => {
-        chunksRef.current.push(event.data);
+        if (event.data.size > 0) chunksRef.current.push(event.data);
       };
 
       chunksRef.current = [];
       mediaRecorder.start();
       mediaRecorderRef.current = mediaRecorder;
 
-      setRecordingTime(0);
+      // Transition to recording state
+      isRecordingRef.current = true;
       setState("recording");
+      setRecordingTime(0);
 
       // Start timer
       timerIntervalRef.current = setInterval(() => {
         setRecordingTime((prev) => prev + 1);
       }, 1000);
+
+      // Start visualization after React re-renders the canvas (isRecordingRef avoids closure bug)
+      setTimeout(() => {
+        const visualize = () => {
+          if (!isRecordingRef.current) return;
+          if (analyserRef.current && canvasRef.current) {
+            const data = waveformDataRef.current as any;
+            if (data) {
+              analyserRef.current.getByteFrequencyData(data);
+              drawWaveform();
+            }
+          }
+          animationFrameRef.current = requestAnimationFrame(visualize);
+        };
+        visualize();
+      }, 100);
+
+      console.log("[Recording] Started successfully");
     } catch (error) {
-      console.error("Error accessing microphone:", error);
-      setErrorMessage(
-        "Unable to access microphone. Please check permissions."
-      );
+      console.error("[Recording] Error:", error);
+      isRecordingRef.current = false;
+      const errName = error instanceof Error ? error.name : "";
+      const errMsg = error instanceof Error ? error.message : String(error);
+      let userMsg: string;
+      if (errName === "NotAllowedError" || errName === "PermissionDeniedError") {
+        userMsg = "Microphone access denied. Please allow microphone access in your browser settings, then try again.";
+      } else if (errName === "NotFoundError" || errName === "DevicesNotFoundError") {
+        userMsg = "No microphone found. Please connect a microphone and try again.";
+      } else if (errName === "NotSupportedError") {
+        userMsg = "Audio recording is not supported in this browser. Please use Chrome or Safari.";
+      } else {
+        userMsg = `Could not start recording: ${errMsg}`;
+      }
+      setErrorMessage(userMsg);
       setState("error");
     }
   };
@@ -140,6 +169,7 @@ export default function MeetingPage() {
       }
 
       mediaRecorderRef.current.onstop = async () => {
+        isRecordingRef.current = false;
         // Clean up
         if (timerIntervalRef.current) {
           clearInterval(timerIntervalRef.current);
@@ -158,8 +188,9 @@ export default function MeetingPage() {
           audioContextRef.current = null;
         }
 
-        // Create blob and upload
-        const audioBlob = new Blob(chunksRef.current, { type: "audio/webm" });
+        // Create blob and upload (use actual recorded mimeType)
+        const recMimeType = mediaRecorderRef.current?.mimeType || "audio/webm";
+        const audioBlob = new Blob(chunksRef.current, { type: recMimeType });
         await uploadAndProcess(audioBlob);
 
         resolve();
@@ -432,18 +463,19 @@ export default function MeetingPage() {
   };
 
   const glassStyle = {
-    background: "rgba(255,255,255,0.22)",
-    backdropFilter: "blur(28px)",
-    WebkitBackdropFilter: "blur(28px)",
-    boxShadow: "0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.2)",
+    background: "rgba(255,255,255,0.14)",
+    backdropFilter: "blur(32px)",
+    WebkitBackdropFilter: "blur(32px)",
+    boxShadow: "0 4px 24px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.15)",
     borderRadius: "20px",
   } as React.CSSProperties;
 
   return (
     <div
-      className="min-h-screen pb-24 px-5"
+      className="pb-24 px-5"
       style={{
-        backgroundImage: `linear-gradient(175deg, rgba(10,46,56,0.82) 0%, rgba(26,74,74,0.72) 25%, rgba(45,107,90,0.6) 40%, rgba(199,106,74,0.65) 65%, rgba(232,149,106,0.5) 80%, rgba(42,26,46,0.85) 100%), url('/bg-sunset.jpg')`,
+        minHeight: "100vh",
+        backgroundImage: `linear-gradient(175deg, rgba(10,46,56,0.9) 0%, rgba(26,74,74,0.8) 25%, rgba(45,107,90,0.7) 40%, rgba(199,106,74,0.7) 65%, rgba(232,149,106,0.6) 80%, rgba(42,26,46,0.92) 100%), url('/bg-sunset.jpg')`,
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundAttachment: "fixed",
@@ -532,6 +564,20 @@ export default function MeetingPage() {
                   Generate Pre-Meeting Brief
                 </button>
               </div>
+            </div>
+          </>
+        )}
+
+        {/* REQUESTING STATE */}
+        {state === "requesting" && (
+          <>
+            <h1 className="serif-heading text-3xl mb-8 text-white font-bold">
+              Starting Recording
+            </h1>
+            <div className="flex flex-col items-center justify-center min-h-[400px] space-y-6">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#00c9a7]" />
+              <p className="text-lg text-white font-medium">Requesting microphone access...</p>
+              <p className="text-sm text-white/50 text-center px-4">Please allow microphone access when your browser prompts you</p>
             </div>
           </>
         )}

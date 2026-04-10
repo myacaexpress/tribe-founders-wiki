@@ -10,10 +10,15 @@
   }
 
   body {
-    background-color: #062d2d;
+    background-color: #1a2e2e;
+    background-image: linear-gradient(175deg, rgba(10,46,56,0.9) 0%, rgba(26,74,74,0.8) 25%, rgba(45,107,90,0.7) 40%, rgba(199,106,74,0.7) 65%, rgba(232,149,106,0.6) 80%, rgba(42,26,46,0.92) 100%), url('/bg-sunset.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
     color: #ffffff;
     margin: 0;
     padding: 0;
+    min-height: 100vh;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -48,13 +53,13 @@
 
 @layer components {
   .card {
-    background: rgba(255, 255, 255, 0.22);
-    backdrop-filter: blur(28px);
-    -webkit-backdrop-filter: blur(28px);
+    background: rgba(255, 255, 255, 0.14);
+    backdrop-filter: blur(32px);
+    -webkit-backdrop-filter: blur(32px);
     border-radius: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.25);
     padding: 1.5rem;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.15);
   }
 
   .btn-primary {

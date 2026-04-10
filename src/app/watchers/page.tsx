@@ -39,7 +39,18 @@ export default function WatchersPage() {
       const response = await fetch("/api/watchers/list");
       if (!response.ok) throw new Error("Failed to load watchers");
       const data = await response.json();
-      setWatchers(data.watchers || []);
+      // Flatten nested config into WatcherInfo shape
+      const flat: WatcherInfo[] = (data.watchers || []).map((w: any) => ({
+        name: w.name || "",
+        founder: w.config?.founder || "",
+        type: w.config?.type || "",
+        targetPage: w.config?.targetPage || "",
+        schedule: w.config?.schedule || "",
+        description: w.config?.description || "",
+        active: w.active !== false,
+        valid: w.status === "configured",
+      }));
+      setWatchers(flat);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load watchers");
     } finally {
@@ -64,8 +75,8 @@ export default function WatchersPage() {
     }
   };
 
-  const founderColor = (founder: string) => {
-    switch (founder.toLowerCase()) {
+  const founderColor = (founder: string | undefined) => {
+    switch ((founder || "").toLowerCase()) {
       case "shawn":
         return "text-[#2b8a88]";
       case "mark":
