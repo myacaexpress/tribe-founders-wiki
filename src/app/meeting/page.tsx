@@ -387,15 +387,14 @@ export default function MeetingPage() {
     const width = canvas.width;
     const height = canvas.height;
 
-    // Clear canvas
-    ctx.fillStyle = "#ffffff";
-    ctx.fillRect(0, 0, width, height);
+    // Clear canvas (transparent)
+    ctx.clearRect(0, 0, width, height);
 
     // Draw waveform bars
     const barWidth = width / 20;
     const data = waveformDataRef.current;
 
-    ctx.fillStyle = "#2b8a88";
+    ctx.fillStyle = "rgba(255, 255, 255, 0.85)";
     for (let i = 0; i < 20; i++) {
       const index = Math.floor((i / 20) * data.length);
       const value = data[index] / 255;
@@ -416,39 +415,43 @@ export default function MeetingPage() {
 
   const getItemColor = (type: string) => {
     switch (type) {
-      case "task":
-        return "bg-[#f0f8f7] text-[#2b8a88]";
-      case "decision":
-        return "bg-[#fef4f2] text-[#e85d4e]";
-      case "idea":
-        return "bg-[#f5f7f4] text-[#a8b5a0]";
-      default:
-        return "bg-[#faf7f2] text-[#8a8580]";
+      case "task":     return "text-[#00c9a7]";
+      case "decision": return "text-[#ff7b6b]";
+      case "idea":     return "text-[#b8c8b0]";
+      default:         return "text-white/60";
     }
   };
 
   const getItemBadgeColor = (type: string) => {
     switch (type) {
-      case "task":
-        return "bg-[#2b8a88] text-white";
-      case "decision":
-        return "bg-[#e85d4e] text-white";
-      case "idea":
-        return "bg-[#a8b5a0] text-white";
-      default:
-        return "bg-[#8a8580] text-white";
+      case "task":     return "bg-[#00c9a7]/20 text-[#00c9a7]";
+      case "decision": return "bg-[#ff7b6b]/20 text-[#ff7b6b]";
+      case "idea":     return "bg-[#b8c8b0]/20 text-[#b8c8b0]";
+      default:         return "bg-white/10 text-white/60";
     }
   };
 
+  const glassStyle = {
+    background: "rgba(255,255,255,0.12)",
+    backdropFilter: "blur(20px)",
+    WebkitBackdropFilter: "blur(20px)",
+  } as React.CSSProperties;
+
   return (
-    <div className="min-h-screen bg-[#faf7f2] pb-24">
+    <div
+      className="min-h-screen pb-24"
+      style={{ background: "linear-gradient(180deg,#062d2d 0%,#0e6b5c 35%,#c4673a 68%,#5c1f0a 100%)" }}
+    >
       <div className="container-main py-6">
-        {/* Header */}
-        <div className="flex items-center gap-3 mb-8">
-          <Link
-            href="/"
-            className="text-[#8a8580] hover:text-[#1a1a1a] transition-colors"
-          >
+
+        {/* Logo + back */}
+        <div className="text-center mb-6">
+          <span className="text-3xl font-bold font-serif text-white">Tri</span>
+          <span className="text-3xl font-bold font-serif text-[#ff7b6b]">Be</span>
+          <p className="text-xs font-semibold text-white/50 tracking-widest mt-1">FOUNDERS — FLORIDA</p>
+        </div>
+        <div className="mb-6">
+          <Link href="/" className="text-white/60 hover:text-white transition-colors text-sm">
             ← Back
           </Link>
         </div>
@@ -456,14 +459,14 @@ export default function MeetingPage() {
         {/* IDLE STATE */}
         {state === "idle" && (
           <>
-            <h1 className="serif-heading text-3xl mb-8 text-[#1a1a1a]">
+            <h1 className="serif-heading text-3xl mb-8 text-white font-bold">
               Record Meeting
             </h1>
 
-            <div className="space-y-6">
+            <div className="space-y-5">
               {/* Meeting title input */}
-              <div>
-                <label className="block text-sm font-medium text-[#1a1a1a] mb-2">
+              <div className="rounded-2xl border border-white/20 p-5" style={glassStyle}>
+                <label className="block text-sm font-medium text-white/80 mb-2">
                   Meeting Title (optional)
                 </label>
                 <input
@@ -471,44 +474,29 @@ export default function MeetingPage() {
                   value={meetingTitle}
                   onChange={(e) => setMeetingTitle(e.target.value)}
                   placeholder="e.g., Weekly standup, Carrier meeting..."
-                  className="w-full px-4 py-3 border border-[#eae4da] rounded-lg bg-white text-[#1a1a1a] placeholder-[#8a8580] focus:outline-none focus:border-[#2b8a88] focus:ring-2 focus:ring-[#2b8a88] focus:ring-opacity-20 transition-all"
+                  className="w-full px-4 py-3 rounded-xl text-white placeholder:text-white/40 focus:outline-none focus:border-white/60 transition-all bg-white/10 border border-white/30"
                 />
               </div>
 
               {/* Attendees checkboxes */}
-              <div>
-                <label className="block text-sm font-medium text-[#1a1a1a] mb-3">
+              <div className="rounded-2xl border border-white/20 p-5" style={glassStyle}>
+                <label className="block text-sm font-medium text-white/80 mb-3">
                   Attendees
                 </label>
-                <div className="space-y-2">
+                <div className="space-y-3">
                   {[
-                    {
-                      key: "shawn" as const,
-                      label: "Shawn",
-                      color: "text-[#2b8a88]",
-                    },
-                    {
-                      key: "mark" as const,
-                      label: "Mark",
-                      color: "text-[#e85d4e]",
-                    },
-                    {
-                      key: "michael" as const,
-                      label: "Michael",
-                      color: "text-[#a8b5a0]",
-                    },
+                    { key: "shawn" as const, label: "Shawn", color: "text-[#00c9a7]" },
+                    { key: "mark" as const,  label: "Mark",  color: "text-[#ff7b6b]" },
+                    { key: "michael" as const, label: "Michael", color: "text-[#b8c8b0]" },
                   ].map(({ key, label, color }) => (
-                    <label
-                      key={key}
-                      className="flex items-center gap-3 cursor-pointer"
-                    >
+                    <label key={key} className="flex items-center gap-3 cursor-pointer">
                       <input
                         type="checkbox"
                         checked={attendees[key]}
                         onChange={() => handleAttendeeChange(key)}
                         className="w-4 h-4 cursor-pointer"
                       />
-                      <span className={`font-medium ${color}`}>{label}</span>
+                      <span className={`font-semibold ${color}`}>{label}</span>
                     </label>
                   ))}
                 </div>
@@ -518,19 +506,21 @@ export default function MeetingPage() {
               <div className="flex flex-col gap-3">
                 <button
                   onClick={startMeetingWithRecording}
-                  className="w-full py-4 px-4 bg-[#2b8a88] text-white rounded-lg font-semibold text-lg hover:opacity-90 transition-opacity text-center"
+                  className="w-full py-4 px-6 bg-[#00c9a7] text-white rounded-full font-bold text-lg hover:opacity-90 transition-opacity text-center"
                 >
                   Start Meeting + Record
                 </button>
                 <button
                   onClick={startRecording}
-                  className="w-full py-3 px-4 border-2 border-[#2b8a88] text-[#2b8a88] rounded-lg font-semibold hover:bg-[#f0f8f7] transition-colors"
+                  className="w-full py-3 px-6 border border-white/30 text-white rounded-full font-semibold hover:bg-white/10 transition-colors"
+                  style={{ background: "rgba(255,255,255,0.08)" }}
                 >
                   Record Audio Only
                 </button>
                 <button
                   onClick={generateBrief}
-                  className="w-full py-3 px-4 border border-[#eae4da] bg-white text-[#1a1a1a] rounded-lg font-semibold hover:bg-[#faf7f2] transition-colors"
+                  className="w-full py-3 px-6 border border-white/20 text-white/70 rounded-full font-semibold hover:bg-white/10 transition-colors"
+                  style={{ background: "rgba(255,255,255,0.05)" }}
                 >
                   Generate Pre-Meeting Brief
                 </button>
@@ -542,26 +532,24 @@ export default function MeetingPage() {
         {/* RECORDING STATE */}
         {state === "recording" && (
           <>
-            <h1 className="serif-heading text-3xl mb-8 text-[#1a1a1a]">
+            <h1 className="serif-heading text-3xl mb-8 text-white font-bold">
               Meeting in Progress
             </h1>
 
-            <div className="space-y-6">
-              {/* Recording indicator */}
-              <div className="flex items-center justify-center gap-3">
-                <div className="w-3 h-3 bg-[#e85d4e] rounded-full animate-pulse" />
-                <span className="text-[#e85d4e] font-medium">Recording</span>
-              </div>
-
-              {/* Elapsed time */}
-              <div className="text-center">
-                <p className="text-4xl font-mono font-bold text-[#1a1a1a]">
+            <div className="space-y-5">
+              {/* Recording indicator + timer */}
+              <div className="rounded-2xl border border-white/20 p-6 text-center" style={glassStyle}>
+                <div className="flex items-center justify-center gap-3 mb-3">
+                  <div className="w-3 h-3 bg-[#e85d4e] rounded-full animate-pulse" />
+                  <span className="text-[#ff7b6b] font-semibold tracking-wide">RECORDING</span>
+                </div>
+                <p className="text-5xl font-mono font-bold text-white">
                   {formatTime(recordingTime)}
                 </p>
               </div>
 
               {/* Waveform visualizer */}
-              <div className="bg-white rounded-lg border border-[#eae4da] p-4">
+              <div className="rounded-xl p-4 border border-white/20" style={{ background: "rgba(0,0,0,0.2)" }}>
                 <canvas
                   ref={canvasRef}
                   width={300}
@@ -572,17 +560,17 @@ export default function MeetingPage() {
               </div>
 
               {/* Google Meet */}
-              <div className="bg-white rounded-lg border border-[#eae4da] p-4 space-y-3">
+              <div className="rounded-2xl border border-white/20 p-5 space-y-3" style={glassStyle}>
                 <a
                   href="https://meet.google.com/new"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block w-full py-3 px-4 bg-[#2b8a88] text-white rounded-lg font-semibold text-center hover:opacity-90 transition-opacity"
+                  className="block w-full py-3 px-6 bg-[#00c9a7] text-white rounded-full font-bold text-center hover:opacity-90 transition-opacity"
                 >
                   Open Google Meet
                 </a>
-                <p className="text-xs text-[#8a8580] text-center">
-                  Paste your Meet link below to share it with attendees
+                <p className="text-xs text-white/50 text-center">
+                  Paste your Meet link below to share with attendees
                 </p>
                 <div className="flex gap-2">
                   <input
@@ -590,12 +578,12 @@ export default function MeetingPage() {
                     value={meetUrl}
                     onChange={(e) => setMeetUrl(e.target.value)}
                     placeholder="meet.google.com/xxx-xxxx-xxx"
-                    className="flex-1 px-3 py-2 text-sm border border-[#eae4da] rounded-lg bg-[#faf7f2] text-[#1a1a1a] placeholder-[#8a8580] focus:outline-none focus:border-[#2b8a88]"
+                    className="flex-1 px-3 py-2 text-sm rounded-xl text-white placeholder:text-white/40 focus:outline-none focus:border-white/60 bg-white/10 border border-white/30"
                   />
                   {meetUrl && (
                     <button
                       onClick={copyMeetUrl}
-                      className="px-3 py-2 text-sm bg-[#2b8a88] text-white rounded-lg hover:opacity-90 transition-opacity whitespace-nowrap"
+                      className="px-4 py-2 text-sm bg-[#00c9a7] text-white rounded-full font-semibold hover:opacity-90 transition-opacity whitespace-nowrap"
                     >
                       {meetUrlCopied ? "Copied!" : "Copy"}
                     </button>
@@ -605,15 +593,15 @@ export default function MeetingPage() {
                   <div className="flex gap-2">
                     <a
                       href={getMeetShareLinks().mailto}
-                      className="flex-1 py-2 px-3 text-sm text-center border border-[#eae4da] rounded-lg text-[#1a1a1a] hover:bg-[#faf7f2] transition-colors"
+                      className="flex-1 py-2 px-3 text-sm text-center border border-white/20 rounded-full text-white/80 hover:bg-white/10 transition-colors"
                     >
-                      Share via Email
+                      Email
                     </a>
                     <a
                       href={getMeetShareLinks().imessage}
-                      className="flex-1 py-2 px-3 text-sm text-center border border-[#eae4da] rounded-lg text-[#1a1a1a] hover:bg-[#faf7f2] transition-colors"
+                      className="flex-1 py-2 px-3 text-sm text-center border border-white/20 rounded-full text-white/80 hover:bg-white/10 transition-colors"
                     >
-                      Share via iMessage
+                      iMessage
                     </a>
                   </div>
                 )}
@@ -622,9 +610,9 @@ export default function MeetingPage() {
               {/* Stop recording button */}
               <button
                 onClick={stopRecording}
-                className="w-full py-4 px-4 bg-[#e85d4e] text-white rounded-lg font-semibold text-lg hover:opacity-90 transition-opacity"
+                className="w-full py-4 px-6 bg-[#e85d4e] text-white rounded-full font-bold text-lg hover:opacity-90 transition-opacity"
               >
-                End Meeting & Transcribe
+                End Meeting &amp; Transcribe
               </button>
             </div>
           </>
@@ -633,126 +621,84 @@ export default function MeetingPage() {
         {/* PROCESSING STATE */}
         {state === "processing" && (
           <>
-            <h1 className="serif-heading text-3xl mb-8 text-[#1a1a1a]">
-              Recording Saved
+            <h1 className="serif-heading text-3xl mb-8 text-white font-bold">
+              Processing
             </h1>
-
             <div className="space-y-6 flex flex-col items-center justify-center min-h-[400px]">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#2b8a88]" />
-              <p className="text-lg text-[#1a1a1a] font-medium">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#00c9a7]" />
+              <p className="text-lg text-white font-medium">
                 {processingStep === "transcribing"
                   ? "Transcribing audio..."
                   : "Processing transcript..."}
               </p>
-              <p className="text-sm text-[#8a8580]">
-                This may take a moment
-              </p>
+              <p className="text-sm text-white/50">This may take a moment</p>
             </div>
           </>
         )}
 
-        {/* BRIEFING STATE */}
+        {/* BRIEFING STATE — loading */}
         {state === "briefing" && !briefContent && (
           <>
-            <h1 className="serif-heading text-3xl mb-8 text-[#1a1a1a]">
+            <h1 className="serif-heading text-3xl mb-8 text-white font-bold">
               Generating Brief
             </h1>
             <div className="space-y-6 flex flex-col items-center justify-center min-h-[400px]">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#2b8a88]" />
-              <p className="text-lg text-[#1a1a1a] font-medium">
-                Pulling data from the wiki...
-              </p>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#00c9a7]" />
+              <p className="text-lg text-white font-medium">Pulling data from the wiki...</p>
             </div>
           </>
         )}
 
+        {/* BRIEFING STATE — content */}
         {state === "briefing" && briefContent && (
           <>
-            <h1 className="serif-heading text-3xl mb-8 text-[#1a1a1a]">
+            <h1 className="serif-heading text-3xl mb-8 text-white font-bold">
               Pre-Meeting Brief
             </h1>
-            <div className="space-y-6">
-              <div className="bg-white border border-[#eae4da] rounded-lg p-6">
-                <div className="prose prose-sm max-w-none text-[#1a1a1a]">
+            <div className="space-y-5">
+              <div className="rounded-2xl border border-white/20 p-6" style={glassStyle}>
+                <div className="prose prose-sm max-w-none">
                   {briefContent.split("\n").map((line, i) => {
-                    if (line.startsWith("# ")) {
+                    if (line.startsWith("# "))
+                      return <h1 key={i} className="serif-heading text-xl mb-2 text-white">{line.replace("# ", "")}</h1>;
+                    if (line.startsWith("## "))
+                      return <h2 key={i} className="serif-heading text-lg mt-4 mb-2 text-[#00c9a7]">{line.replace("## ", "")}</h2>;
+                    if (line.startsWith("### "))
+                      return <h3 key={i} className="text-sm font-bold mt-3 mb-1 text-white capitalize">{line.replace("### ", "")}</h3>;
+                    if (line.startsWith("- [ ] "))
                       return (
-                        <h1
-                          key={i}
-                          className="serif-heading text-xl mb-2 text-[#1a1a1a]"
-                        >
-                          {line.replace("# ", "")}
-                        </h1>
-                      );
-                    }
-                    if (line.startsWith("## ")) {
-                      return (
-                        <h2
-                          key={i}
-                          className="serif-heading text-lg mt-4 mb-2 text-[#2b8a88]"
-                        >
-                          {line.replace("## ", "")}
-                        </h2>
-                      );
-                    }
-                    if (line.startsWith("### ")) {
-                      return (
-                        <h3
-                          key={i}
-                          className="text-sm font-bold mt-3 mb-1 text-[#1a1a1a] capitalize"
-                        >
-                          {line.replace("### ", "")}
-                        </h3>
-                      );
-                    }
-                    if (line.startsWith("- [ ] ")) {
-                      return (
-                        <div key={i} className="flex items-start gap-2 ml-2 text-sm">
-                          <span className="text-[#8a8580] mt-0.5">&#9633;</span>
+                        <div key={i} className="flex items-start gap-2 ml-2 text-sm text-white/80">
+                          <span className="text-white/40 mt-0.5">&#9633;</span>
                           <span>{line.replace("- [ ] ", "")}</span>
                         </div>
                       );
-                    }
-                    if (line.startsWith("- ")) {
+                    if (line.startsWith("- "))
                       return (
-                        <div key={i} className="flex items-start gap-2 ml-2 text-sm">
-                          <span className="text-[#2b8a88] mt-0.5">&#8226;</span>
+                        <div key={i} className="flex items-start gap-2 ml-2 text-sm text-white/80">
+                          <span className="text-[#00c9a7] mt-0.5">&#8226;</span>
                           <span>{line.replace("- ", "")}</span>
                         </div>
                       );
-                    }
-                    if (line.startsWith("**")) {
-                      return (
-                        <p key={i} className="text-sm text-[#8a8580]">
-                          {line.replace(/\*\*/g, "")}
-                        </p>
-                      );
-                    }
-                    if (line.trim() === "") {
+                    if (line.startsWith("**"))
+                      return <p key={i} className="text-sm text-white/60">{line.replace(/\*\*/g, "")}</p>;
+                    if (line.trim() === "")
                       return <div key={i} className="h-2" />;
-                    }
-                    return (
-                      <p key={i} className="text-sm">
-                        {line}
-                      </p>
-                    );
+                    return <p key={i} className="text-sm text-white/80">{line}</p>;
                   })}
                 </div>
               </div>
 
               <div className="flex flex-col gap-3">
                 <button
-                  onClick={() => {
-                    setBriefContent("");
-                    setState("idle");
-                  }}
-                  className="w-full py-3 px-4 bg-[#2b8a88] text-white rounded-lg font-semibold hover:opacity-90 transition-opacity"
+                  onClick={() => { setBriefContent(""); setState("idle"); }}
+                  className="w-full py-4 px-6 bg-[#00c9a7] text-white rounded-full font-bold hover:opacity-90 transition-opacity"
                 >
                   Ready — Start Recording
                 </button>
                 <button
                   onClick={resetForm}
-                  className="w-full py-3 px-4 border border-[#eae4da] bg-white text-[#1a1a1a] rounded-lg font-semibold hover:bg-[#faf7f2] transition-colors"
+                  className="w-full py-3 px-6 border border-white/30 text-white rounded-full font-semibold hover:bg-white/10 transition-colors"
+                  style={{ background: "rgba(255,255,255,0.08)" }}
                 >
                   Back
                 </button>
@@ -764,18 +710,14 @@ export default function MeetingPage() {
         {/* ERROR STATE */}
         {state === "error" && (
           <>
-            <h1 className="serif-heading text-3xl mb-8 text-[#1a1a1a]">
-              Error
-            </h1>
-
-            <div className="space-y-6">
-              <div className="bg-[#fef4f2] border border-[#e85d4e] rounded-lg p-4">
-                <p className="text-[#e85d4e] font-medium">{errorMessage}</p>
+            <h1 className="serif-heading text-3xl mb-8 text-white font-bold">Error</h1>
+            <div className="space-y-5">
+              <div className="rounded-2xl border border-[#ff7b6b]/40 p-5" style={{ background: "rgba(232,93,78,0.15)" }}>
+                <p className="text-[#ff7b6b] font-medium">{errorMessage}</p>
               </div>
-
               <button
                 onClick={resetForm}
-                className="w-full py-3 px-4 bg-[#2b8a88] text-white rounded-lg font-semibold hover:opacity-90 transition-opacity"
+                className="w-full py-4 px-6 bg-[#00c9a7] text-white rounded-full font-bold hover:opacity-90 transition-opacity"
               >
                 Try Again
               </button>
@@ -786,28 +728,28 @@ export default function MeetingPage() {
         {/* REVIEW STATE */}
         {state === "review" && (
           <>
-            <h1 className="serif-heading text-3xl mb-2 text-[#1a1a1a]">
+            <h1 className="serif-heading text-3xl mb-2 text-white font-bold">
               Review Meeting Items
             </h1>
             {summary && (
-              <p className="text-[#8a8580] text-sm mb-6">{summary}</p>
+              <p className="text-white/60 text-sm mb-6">{summary}</p>
             )}
 
             <div className="space-y-6">
               {/* Confirm All banner */}
               {reviewItems.some((i) => i.status === "pending") && (
-                <div className="flex items-center justify-between bg-white border border-[#eae4da] rounded-lg p-4">
+                <div className="flex items-center justify-between rounded-2xl border border-white/20 p-4" style={glassStyle}>
                   <div>
-                    <p className="text-sm font-medium text-[#1a1a1a]">
-                      {reviewItems.filter((i) => i.status === "pending").length} item{reviewItems.filter((i) => i.status === "pending").length !== 1 ? "s" : ""} pending review
+                    <p className="text-sm font-medium text-white">
+                      {reviewItems.filter((i) => i.status === "pending").length} item{reviewItems.filter((i) => i.status === "pending").length !== 1 ? "s" : ""} pending
                     </p>
-                    <p className="text-xs text-[#8a8580]">
-                      {reviewItems.filter((i) => i.status === "confirmed").length} confirmed, {reviewItems.filter((i) => i.status === "skipped").length} skipped
+                    <p className="text-xs text-white/50">
+                      {reviewItems.filter((i) => i.status === "confirmed").length} confirmed · {reviewItems.filter((i) => i.status === "skipped").length} skipped
                     </p>
                   </div>
                   <button
                     onClick={confirmAll}
-                    className="px-4 py-2 bg-[#2b8a88] text-white text-sm font-semibold rounded-lg hover:opacity-90 transition-opacity"
+                    className="px-4 py-2 bg-[#00c9a7] text-white text-sm font-bold rounded-full hover:opacity-90 transition-opacity"
                   >
                     Confirm All
                   </button>
@@ -819,40 +761,42 @@ export default function MeetingPage() {
                 const typeItems = reviewItems
                   .map((item, idx) => ({ item, idx }))
                   .filter(({ item }) => item.type === type);
-
                 if (typeItems.length === 0) return null;
 
                 return (
                   <div key={type}>
-                    <h2 className="serif-heading text-lg mb-3 text-[#1a1a1a] capitalize">
+                    <h2 className="serif-heading text-lg mb-3 text-white font-bold capitalize">
                       {type === "question" ? "Open Questions" : `${type}s`}
                     </h2>
                     <div className="space-y-3">
                       {typeItems.map(({ item, idx }) => (
                         <div
                           key={idx}
-                          className={`rounded-lg border transition-all ${
-                            item.status === "confirmed"
-                              ? "border-[#2b8a88] bg-[#f0f8f7]"
+                          className="rounded-2xl border transition-all"
+                          style={{
+                            background: item.status === "confirmed"
+                              ? "rgba(0,201,167,0.15)"
                               : item.status === "skipped"
-                              ? "border-[#eae4da] bg-[#f5f4f2] opacity-60"
-                              : "border-[#eae4da] bg-white"
-                          }`}
+                              ? "rgba(255,255,255,0.04)"
+                              : "rgba(255,255,255,0.08)",
+                            borderColor: item.status === "confirmed"
+                              ? "rgba(0,201,167,0.5)"
+                              : item.status === "skipped"
+                              ? "rgba(255,255,255,0.1)"
+                              : "rgba(255,255,255,0.2)",
+                            opacity: item.status === "skipped" ? 0.6 : 1,
+                          }}
                         >
                           <div className="p-4">
                             <div className="flex items-start gap-3">
                               {/* Status indicator */}
                               <div className="flex-shrink-0 mt-1">
                                 {item.status === "confirmed" ? (
-                                  <span className="inline-flex items-center justify-center w-5 h-5 bg-[#2b8a88] rounded-full text-white text-xs">
-                                    &#10003;
-                                  </span>
+                                  <span className="inline-flex items-center justify-center w-5 h-5 bg-[#00c9a7] rounded-full text-white text-xs">&#10003;</span>
                                 ) : item.status === "skipped" ? (
-                                  <span className="inline-flex items-center justify-center w-5 h-5 bg-[#8a8580] rounded-full text-white text-xs">
-                                    &#8212;
-                                  </span>
+                                  <span className="inline-flex items-center justify-center w-5 h-5 bg-white/20 rounded-full text-white text-xs">&#8212;</span>
                                 ) : (
-                                  <span className="inline-flex items-center justify-center w-5 h-5 border-2 border-[#eae4da] rounded-full" />
+                                  <span className="inline-flex items-center justify-center w-5 h-5 border-2 border-white/30 rounded-full" />
                                 )}
                               </div>
 
@@ -862,27 +806,19 @@ export default function MeetingPage() {
                                   <div className="space-y-2">
                                     <textarea
                                       value={item.editedContent ?? item.content}
-                                      onChange={(e) =>
-                                        updateReviewItem(idx, {
-                                          editedContent: e.target.value,
-                                        })
-                                      }
+                                      onChange={(e) => updateReviewItem(idx, { editedContent: e.target.value })}
                                       rows={2}
-                                      className="w-full px-3 py-2 border border-[#eae4da] rounded-lg bg-white text-[#1a1a1a] text-sm focus:outline-none focus:border-[#2b8a88] focus:ring-1 focus:ring-[#2b8a88]"
+                                      className="w-full px-3 py-2 rounded-xl text-white placeholder:text-white/40 focus:outline-none focus:border-white/60 bg-white/10 border border-white/30 text-sm"
                                     />
                                     {(item.type === "task" || item.type === "idea") && (
                                       <div className="flex items-center gap-2">
-                                        <label className="text-xs text-[#8a8580]">
+                                        <label className="text-xs text-white/50">
                                           {item.type === "task" ? "Owner:" : "Speaker:"}
                                         </label>
                                         <select
                                           value={item.editedOwner ?? item.owner ?? ""}
-                                          onChange={(e) =>
-                                            updateReviewItem(idx, {
-                                              editedOwner: e.target.value,
-                                            })
-                                          }
-                                          className="px-2 py-1 border border-[#eae4da] rounded text-sm bg-white text-[#1a1a1a]"
+                                          onChange={(e) => updateReviewItem(idx, { editedOwner: e.target.value })}
+                                          className="px-2 py-1 rounded-lg text-sm bg-white/10 border border-white/30 text-white"
                                         >
                                           <option value="">Unassigned</option>
                                           <option value="shawn">Shawn</option>
@@ -894,29 +830,17 @@ export default function MeetingPage() {
                                   </div>
                                 ) : (
                                   <>
-                                    <p className={`text-sm font-medium ${
-                                      item.status === "skipped"
-                                        ? "text-[#8a8580] line-through"
-                                        : "text-[#1a1a1a]"
-                                    }`}>
+                                    <p className={`text-sm font-medium ${item.status === "skipped" ? "text-white/40 line-through" : "text-white"}`}>
                                       {item.editedContent || item.content}
                                     </p>
                                     {(item.owner || item.editedOwner) && (
-                                      <p className="text-xs text-[#8a8580] mt-1">
+                                      <p className="text-xs text-white/50 mt-1">
                                         {item.type === "task" ? "Owner" : "Speaker"}:{" "}
-                                        <span className="capitalize">
-                                          {item.editedOwner || item.owner}
-                                        </span>
+                                        <span className="capitalize">{item.editedOwner || item.owner}</span>
                                       </p>
                                     )}
                                     {item.confidence && (
-                                      <span
-                                        className={`inline-block text-xs px-1.5 py-0.5 rounded mt-1 ${
-                                          item.confidence === "high"
-                                            ? "bg-[#f0f8f7] text-[#2b8a88]"
-                                            : "bg-[#fef9f0] text-[#e8a33d]"
-                                        }`}
-                                      >
+                                      <span className={`inline-block text-xs px-1.5 py-0.5 rounded-full mt-1 ${item.confidence === "high" ? "bg-[#00c9a7]/20 text-[#00c9a7]" : "bg-amber-400/20 text-amber-300"}`}>
                                         {item.confidence} confidence
                                       </span>
                                     )}
@@ -925,47 +849,30 @@ export default function MeetingPage() {
                               </div>
 
                               {/* Badge */}
-                              <span
-                                className={`text-xs font-bold px-2 py-1 rounded flex-shrink-0 ${getItemBadgeColor(
-                                  item.type
-                                )}`}
-                              >
-                                {item.type.charAt(0).toUpperCase() +
-                                  item.type.slice(1)}
+                              <span className={`text-xs font-bold px-2 py-1 rounded-full flex-shrink-0 ${getItemBadgeColor(item.type)}`}>
+                                {item.type.charAt(0).toUpperCase() + item.type.slice(1)}
                               </span>
                             </div>
 
                             {/* Action buttons */}
                             {item.status !== "confirmed" && item.status !== "skipped" && (
                               <div className="flex items-center gap-2 mt-3 ml-8">
-                                <button
-                                  onClick={() => confirmItem(idx)}
-                                  className="px-3 py-1.5 bg-[#2b8a88] text-white text-xs font-semibold rounded hover:opacity-90 transition-opacity"
-                                >
+                                <button onClick={() => confirmItem(idx)} className="px-3 py-1.5 bg-[#00c9a7] text-white text-xs font-bold rounded-full hover:opacity-90 transition-opacity">
                                   Confirm
                                 </button>
-                                <button
-                                  onClick={() => toggleEdit(idx)}
-                                  className="px-3 py-1.5 border border-[#eae4da] text-[#1a1a1a] text-xs font-semibold rounded hover:bg-[#faf7f2] transition-colors"
-                                >
-                                  {item.isEditing ? "Done Editing" : "Edit"}
+                                <button onClick={() => toggleEdit(idx)} className="px-3 py-1.5 border border-white/30 text-white text-xs font-semibold rounded-full hover:bg-white/10 transition-colors">
+                                  {item.isEditing ? "Done" : "Edit"}
                                 </button>
-                                <button
-                                  onClick={() => skipItem(idx)}
-                                  className="px-3 py-1.5 text-[#8a8580] text-xs font-semibold rounded hover:bg-[#f5f4f2] transition-colors"
-                                >
+                                <button onClick={() => skipItem(idx)} className="px-3 py-1.5 text-white/40 text-xs font-semibold rounded-full hover:text-white/70 transition-colors">
                                   Skip
                                 </button>
                               </div>
                             )}
 
-                            {/* Undo for confirmed/skipped */}
+                            {/* Undo */}
                             {(item.status === "confirmed" || item.status === "skipped") && (
                               <div className="mt-2 ml-8">
-                                <button
-                                  onClick={() => updateReviewItem(idx, { status: "pending" })}
-                                  className="text-xs text-[#8a8580] hover:text-[#1a1a1a] transition-colors"
-                                >
+                                <button onClick={() => updateReviewItem(idx, { status: "pending" })} className="text-xs text-white/40 hover:text-white transition-colors">
                                   Undo
                                 </button>
                               </div>
@@ -979,12 +886,12 @@ export default function MeetingPage() {
               })}
 
               {/* Collapsible transcript */}
-              <details className="bg-white border border-[#eae4da] rounded-lg">
-                <summary className="p-4 cursor-pointer text-sm font-medium text-[#8a8580] hover:text-[#1a1a1a] transition-colors">
+              <details className="rounded-2xl border border-white/20 overflow-hidden" style={glassStyle}>
+                <summary className="p-4 cursor-pointer text-sm font-medium text-white/50 hover:text-white transition-colors">
                   View Full Transcript
                 </summary>
                 <div className="px-4 pb-4">
-                  <p className="text-[#1a1a1a] leading-relaxed whitespace-pre-wrap text-xs">
+                  <p className="text-white/70 leading-relaxed whitespace-pre-wrap text-xs">
                     {transcript}
                   </p>
                 </div>
@@ -995,14 +902,15 @@ export default function MeetingPage() {
                 {reviewItems.some((i) => i.status === "confirmed") && (
                   <button
                     onClick={saveConfirmed}
-                    className="w-full py-3 px-4 bg-[#2b8a88] text-white rounded-lg font-semibold hover:opacity-90 transition-opacity"
+                    className="w-full py-4 px-6 bg-[#00c9a7] text-white rounded-full font-bold hover:opacity-90 transition-opacity"
                   >
-                    Save {reviewItems.filter((i) => i.status === "confirmed").length} Confirmed Item{reviewItems.filter((i) => i.status === "confirmed").length !== 1 ? "s" : ""} to Wiki
+                    Save {reviewItems.filter((i) => i.status === "confirmed").length} Item{reviewItems.filter((i) => i.status === "confirmed").length !== 1 ? "s" : ""} to Wiki
                   </button>
                 )}
                 <button
                   onClick={resetForm}
-                  className="w-full py-3 px-4 border border-[#eae4da] bg-white text-[#1a1a1a] rounded-lg font-semibold hover:bg-[#faf7f2] transition-colors"
+                  className="w-full py-3 px-6 border border-white/30 text-white rounded-full font-semibold hover:bg-white/10 transition-colors"
+                  style={{ background: "rgba(255,255,255,0.08)" }}
                 >
                   Discard &amp; Start Over
                 </button>
@@ -1014,14 +922,10 @@ export default function MeetingPage() {
         {/* SAVING STATE */}
         {state === "saving" && (
           <>
-            <h1 className="serif-heading text-3xl mb-8 text-[#1a1a1a]">
-              Saving to Wiki
-            </h1>
+            <h1 className="serif-heading text-3xl mb-8 text-white font-bold">Saving to Wiki</h1>
             <div className="space-y-6 flex flex-col items-center justify-center min-h-[400px]">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#2b8a88]" />
-              <p className="text-lg text-[#1a1a1a] font-medium">
-                Writing items to the wiki...
-              </p>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#00c9a7]" />
+              <p className="text-lg text-white font-medium">Writing items to the wiki...</p>
             </div>
           </>
         )}
@@ -1029,28 +933,25 @@ export default function MeetingPage() {
         {/* SAVED STATE */}
         {state === "saved" && (
           <>
-            <h1 className="serif-heading text-3xl mb-8 text-[#1a1a1a]">
-              Meeting Complete
-            </h1>
-            <div className="space-y-6">
-              <div className="bg-[#f0f8f7] border border-[#2b8a88] rounded-lg p-6 text-center">
-                <div className="text-4xl mb-3">&#10003;</div>
-                <p className="text-[#2b8a88] font-semibold text-lg">{saveMessage}</p>
-                <p className="text-[#8a8580] text-sm mt-2">
-                  Items have been committed to your GitHub wiki.
-                </p>
+            <h1 className="serif-heading text-3xl mb-8 text-white font-bold">Meeting Complete</h1>
+            <div className="space-y-5">
+              <div className="rounded-2xl border border-[#00c9a7]/40 p-6 text-center" style={{ background: "rgba(0,201,167,0.15)" }}>
+                <div className="text-4xl mb-3 text-[#00c9a7]">&#10003;</div>
+                <p className="text-[#00c9a7] font-bold text-lg">{saveMessage}</p>
+                <p className="text-white/50 text-sm mt-2">Items committed to your GitHub wiki.</p>
               </div>
 
               <div className="flex flex-col gap-3">
                 <Link
                   href="/"
-                  className="w-full py-3 px-4 bg-[#2b8a88] text-white rounded-lg font-semibold hover:opacity-90 transition-opacity text-center"
+                  className="w-full py-4 px-6 bg-[#00c9a7] text-white rounded-full font-bold hover:opacity-90 transition-opacity text-center"
                 >
                   Back to Home
                 </Link>
                 <button
                   onClick={resetForm}
-                  className="w-full py-3 px-4 border border-[#eae4da] bg-white text-[#1a1a1a] rounded-lg font-semibold hover:bg-[#faf7f2] transition-colors"
+                  className="w-full py-3 px-6 border border-white/30 text-white rounded-full font-semibold hover:bg-white/10 transition-colors"
+                  style={{ background: "rgba(255,255,255,0.08)" }}
                 >
                   Record Another Meeting
                 </button>

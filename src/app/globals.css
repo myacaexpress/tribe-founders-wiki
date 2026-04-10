@@ -10,8 +10,8 @@
   }
 
   body {
-    background-color: #faf7f2;
-    color: #1a1a1a;
+    background-color: #062d2d;
+    color: #ffffff;
     margin: 0;
     padding: 0;
   }
@@ -48,18 +48,20 @@
 
 @layer components {
   .card {
-    background-color: #ffffff;
-    border-radius: 0.5rem;
-    border: 1px solid #eae4da;
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
     padding: 1.5rem;
   }
 
   .btn-primary {
-    padding: 0.5rem 1rem;
-    background-color: #2b8a88;
+    padding: 0.75rem 1.5rem;
+    background-color: #00c9a7;
     color: white;
-    border-radius: 0.5rem;
-    font-weight: 500;
+    border-radius: 9999px;
+    font-weight: 700;
     transition: opacity 0.2s;
     border: none;
     cursor: pointer;
@@ -70,26 +72,26 @@
   }
 
   .btn-secondary {
-    padding: 0.5rem 1rem;
-    border: 1px solid #eae4da;
-    background-color: white;
-    color: #1a1a1a;
-    border-radius: 0.5rem;
-    font-weight: 500;
+    padding: 0.75rem 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    border-radius: 9999px;
+    font-weight: 600;
     transition: background-color 0.2s;
     cursor: pointer;
   }
 
   .btn-secondary:hover {
-    background-color: #faf7f2;
+    background: rgba(255, 255, 255, 0.25);
   }
 
   .btn-coral {
-    padding: 0.5rem 1rem;
+    padding: 0.75rem 1.5rem;
     background-color: #e85d4e;
     color: white;
-    border-radius: 0.5rem;
-    font-weight: 500;
+    border-radius: 9999px;
+    font-weight: 700;
     transition: opacity 0.2s;
     border: none;
     cursor: pointer;
@@ -100,11 +102,11 @@
   }
 
   .btn-sage {
-    padding: 0.5rem 1rem;
-    background-color: #a8b5a0;
+    padding: 0.75rem 1.5rem;
+    background-color: #b8c8b0;
     color: white;
-    border-radius: 0.5rem;
-    font-weight: 500;
+    border-radius: 9999px;
+    font-weight: 700;
     transition: opacity 0.2s;
     border: none;
     cursor: pointer;
@@ -135,16 +137,16 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: #faf7f2;
+  background: rgba(255, 255, 255, 0.05);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #eae4da;
+  background: rgba(255, 255, 255, 0.2);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #d5cfc0;
+  background: rgba(255, 255, 255, 0.35);
 }
 
 /* Remove default focus outline and add custom one */
@@ -159,6 +161,6 @@ button:focus-visible,
 input:focus-visible,
 textarea:focus-visible,
 a:focus-visible {
-  outline: 2px solid #2b8a88;
+  outline: 2px solid #00c9a7;
   outline-offset: 2px;
 }
