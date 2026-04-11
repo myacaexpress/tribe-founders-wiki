@@ -56,84 +56,64 @@ function formatDate(date: Date = new Date()): string {
 }
 
 /**
- * Parse Claude's response to extract structured items
+ * Parse Claude's JSON response to extract structured items
  */
 function parseItems(content: string): MeetingItem[] {
+  // Try to find a JSON array in the response
+  const jsonMatch = content.match(/\[[\s\S]*\]/);
+  if (jsonMatch) {
+    try {
+      const parsed = JSON.parse(jsonMatch[0]);
+      if (Array.isArray(parsed)) {
+        return parsed.map((item: any) => ({
+          type: item.type || "task",
+          text: item.text || item.content || "",
+          owner: item.owner || item.speaker || undefined,
+          confidence: item.confidence || "medium",
+          speaker: item.speaker || undefined,
+        }));
+      }
+    } catch {
+      // JSON parse failed, fall through to text parsing
+    }
+  }
+
+  // Fallback: line-by-line text parsing for bullet points
   const items: MeetingItem[] = [];
+  const lines = content.split("\n");
+  let currentType: MeetingItem["type"] = "task";
 
-  // Parse tasks (look for task markers)
-  const taskRegex = /(?:^|\n)(?:###?\s+)?(?:TASK|Task|TODO|ACTION|Action)[\s:]*\n?([\s\S]*?)(?=(?:^|\n)(?:###?\s+)?(?:TASK|Task|DECISION|Decision|IDEA|Idea|QUESTION|Question)|$)/gm;
-  let match;
+  for (const line of lines) {
+    const trimmed = line.trim();
 
-  // Task pattern: "TASK: description (Owner: name) [confidence]"
-  const taskDetailRegex = /^\s*[-*]?\s*(.+?)(?:\s*\((?:Owner|Assigned to|Owner:):\s*(.+?)\))?(?:\s*\[(\w+)\])?$/;
+    // Detect section headers
+    if (/^#+\s*TASK/i.test(trimmed) || /^TASK/i.test(trimmed)) { currentType = "task"; continue; }
+    if (/^#+\s*DECISION/i.test(trimmed) || /^DECISION/i.test(trimmed)) { currentType = "decision"; continue; }
+    if (/^#+\s*IDEA/i.test(trimmed) || /^IDEA/i.test(trimmed)) { currentType = "idea"; continue; }
+    if (/^#+\s*(?:QUESTION|OPEN)/i.test(trimmed) || /^(?:QUESTION|OPEN)/i.test(trimmed)) { currentType = "question"; continue; }
+    if (/^#+\s*SUMMARY/i.test(trimmed) || /^SUMMARY/i.test(trimmed)) break; // Stop before summary
 
-  while ((match = taskRegex.exec(content)) !== null) {
-    const lines = match[1].trim().split("\n");
-    for (const line of lines) {
-      if (line.trim()) {
-        const detailMatch = line.match(taskDetailRegex);
-        if (detailMatch) {
-          items.push({
-            type: "task",
-            text: detailMatch[1].trim(),
-            owner: detailMatch[2]?.trim(),
-            confidence: (detailMatch[3]?.toLowerCase() as "high" | "medium") || "medium",
-          });
-        }
-      }
-    }
-  }
+    // Match bullet lines (-, *, •, numbered)
+    const bulletMatch = trimmed.match(/^(?:[-*•]|\d+[.)]\s)\s*(.+)/);
+    if (bulletMatch) {
+      const text = bulletMatch[1];
 
-  // Decision pattern
-  const decisionRegex = /(?:^|\n)(?:###?\s+)?(?:DECISION|Decision)[\s:]*\n?([\s\S]*?)(?=(?:^|\n)(?:###?\s+)?(?:TASK|Task|DECISION|Decision|IDEA|Idea|QUESTION|Question)|$)/gm;
-  while ((match = decisionRegex.exec(content)) !== null) {
-    const lines = match[1].trim().split("\n");
-    for (const line of lines) {
-      if (line.trim()) {
-        const detailMatch = line.match(taskDetailRegex);
-        if (detailMatch) {
-          items.push({
-            type: "decision",
-            text: detailMatch[1].trim(),
-            confidence: (detailMatch[3]?.toLowerCase() as "high" | "medium") || "high",
-          });
-        }
-      }
-    }
-  }
+      // Extract owner: "(Owner: name)" or "(name)"
+      const ownerMatch = text.match(/\((?:Owner:\s*)?(\w+)\)/i);
+      const owner = ownerMatch ? ownerMatch[1].toLowerCase() : undefined;
 
-  // Idea pattern
-  const ideaRegex = /(?:^|\n)(?:###?\s+)?(?:IDEA|Idea|INSIGHT|Insight)[\s:]*\n?([\s\S]*?)(?=(?:^|\n)(?:###?\s+)?(?:TASK|Task|DECISION|Decision|IDEA|Idea|QUESTION|Question)|$)/gm;
-  while ((match = ideaRegex.exec(content)) !== null) {
-    const lines = match[1].trim().split("\n");
-    for (const line of lines) {
-      if (line.trim()) {
-        const detailMatch = line.match(taskDetailRegex);
-        if (detailMatch) {
-          items.push({
-            type: "idea",
-            text: detailMatch[1].trim(),
-            speaker: detailMatch[2]?.trim(),
-          });
-        }
-      }
-    }
-  }
+      // Extract confidence: "[high]" or "[medium]"
+      const confMatch = text.match(/\[(high|medium|low)\]/i);
+      const confidence = confMatch ? confMatch[1].toLowerCase() as "high" | "medium" : "medium";
 
-  // Question pattern
-  const questionRegex = /(?:^|\n)(?:###?\s+)?(?:QUESTION|Question|OPEN|Open)[\s:]*\n?([\s\S]*?)(?=(?:^|\n)(?:###?\s+)?(?:TASK|Task|DECISION|Decision|IDEA|Idea|QUESTION|Question)|$)/gm;
-  while ((match = questionRegex.exec(content)) !== null) {
-    const lines = match[1].trim().split("\n");
-    for (const line of lines) {
-      if (line.trim()) {
-        const detailMatch = line.match(taskDetailRegex);
-        if (detailMatch) {
-          items.push({
-            type: "question",
-            text: detailMatch[1].trim(),
-          });
-        }
+      // Clean text
+      const cleanText = text
+        .replace(/\((?:Owner:\s*)?\w+\)/gi, "")
+        .replace(/\[(high|medium|low)\]/gi, "")
+        .trim();
+
+      if (cleanText.length > 2) {
+        items.push({ type: currentType, text: cleanText, owner, confidence });
       }
     }
   }
@@ -145,6 +125,14 @@ function parseItems(content: string): MeetingItem[] {
  * Extract summary from Claude's response
  */
 function extractSummary(content: string): string {
+  // Try JSON format first
+  try {
+    const parsed = JSON.parse(content);
+    if (parsed.summary) return parsed.summary;
+  } catch {
+    // Not JSON
+  }
+
   const summaryRegex = /(?:###?\s+)?(?:SUMMARY|Summary)[\s:]*\n?([\s\S]*?)(?=(?:^|\n)###?\s+|$)/;
   const match = content.match(summaryRegex);
 
