@@ -17,7 +17,7 @@ export interface HomeClientProps {
   businessStateSentence: string;
 }
 
-const BG_GRADIENT = "linear-gradient(180deg, rgba(5,12,25,0.95) 0%, rgba(8,35,42,0.9) 20%, rgba(10,50,50,0.85) 35%, rgba(80,50,35,0.7) 55%, rgba(100,60,45,0.75) 70%, rgba(70,30,25,0.85) 85%, rgba(15,8,15,0.97) 100%)";
+const BG_GRADIENT = "linear-gradient(180deg, rgba(3,8,18,0.98) 0%, rgba(5,22,28,0.96) 20%, rgba(6,32,35,0.94) 35%, rgba(50,32,22,0.88) 55%, rgba(65,38,28,0.9) 70%, rgba(45,18,15,0.94) 85%, rgba(8,4,10,0.99) 100%)";
 
 const glass: React.CSSProperties = {
   background: "rgba(255,255,255,0.08)",
@@ -96,7 +96,7 @@ export default function HomeClient({
         position: "fixed",
         inset: 0,
         zIndex: 0,
-        backgroundImage: `${BG_GRADIENT}, url('/bg-sunset.jpg')`,
+        backgroundImage: `${BG_GRADIENT}, url('/bg-nature.jpg')`,
         backgroundSize: "cover",
         backgroundPosition: "center",
       }} />
