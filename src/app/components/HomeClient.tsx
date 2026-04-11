@@ -124,16 +124,13 @@ export default function HomeClient({
 
         {/* Action buttons */}
         <div style={{ display: "flex", gap: 8, overflowX: "auto", padding: "4px 0", marginBottom: 16, scrollbarWidth: "none" }}>
-          <a
-            href="https://meet.google.com/new"
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link
+            href="/meeting"
             style={{ flexShrink: 0, padding: "10px 20px", borderRadius: 50, fontSize: 14, fontWeight: 600, background: "linear-gradient(135deg, #00c9a7, #00b4d8)", color: "#fff", textDecoration: "none", whiteSpace: "nowrap", boxShadow: "0 4px 15px rgba(0,201,167,0.3)" }}
           >
             Meet
-          </a>
+          </Link>
           {[
-            { href: "/meeting",  label: "Record" },
             { href: "/watchers", label: "Watchers" },
             { href: "/search",   label: "Search" },
             { href: "/wiki",     label: "Full Wiki" },

@@ -591,11 +591,11 @@ export default function MeetingPage() {
             {/* Action buttons */}
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               <button onClick={startMeetingWithRecording} style={btnTeal}>
-                Start Meeting + Record
+                Start Meeting
               </button>
-              <button onClick={startRecording} style={btnGhost}>
-                Record Audio Only
-              </button>
+              <div style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", textAlign: "center", marginTop: -4 }}>
+                Opens Google Meet and begins recording
+              </div>
               <button onClick={generateBrief} style={{ ...btnGhost, color: "rgba(255,255,255,0.5)", fontSize: 14 }}>
                 Generate Pre-Meeting Brief
               </button>

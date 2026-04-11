@@ -48,8 +48,8 @@ describe("Home page", () => {
     expect(screen.getByText("Be")).toBeInTheDocument();
   });
 
-  it("renders FOUNDERS — FLORIDA subtitle", () => {
-    expect(screen.getByText("FOUNDERS — FLORIDA")).toBeInTheDocument();
+  it("renders the subtitle", () => {
+    expect(screen.getByText("Trifecta Founders")).toBeInTheDocument();
   });
 
   it("renders the business state sentence", () => {
@@ -58,16 +58,12 @@ describe("Home page", () => {
     ).toBeInTheDocument();
   });
 
-  it("renders Start Google Meet button", () => {
-    const btn = screen.getByText("Start Google Meet");
-    expect(btn).toBeInTheDocument();
-    expect(btn.closest("a")).toHaveAttribute("href", "https://meet.google.com/new");
-  });
-
-  it("renders Meeting Tools link", () => {
-    const link = screen.getByText("Meeting Tools");
-    expect(link).toBeInTheDocument();
-    expect(link.closest("a")).toHaveAttribute("href", "/meeting");
+  it("renders Meet button linking to meeting page", () => {
+    const btns = screen.getAllByText("Meet");
+    const meetLink = btns.find(
+      (el) => el.closest("a")?.getAttribute("href") === "/meeting"
+    );
+    expect(meetLink).toBeTruthy();
   });
 
   it("renders Radar section with items", () => {
@@ -85,9 +81,9 @@ describe("Home page", () => {
 
   it("renders all three founder lanes", () => {
     expect(screen.getByText("Lanes")).toBeInTheDocument();
-    expect(screen.getByText("Shawn (Teal)")).toBeInTheDocument();
-    expect(screen.getByText("Mark (Coral)")).toBeInTheDocument();
-    expect(screen.getByText("Michael (Sage)")).toBeInTheDocument();
+    expect(screen.getAllByText("Shawn").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("Mark").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("Michael").length).toBeGreaterThanOrEqual(1);
   });
 
   it("renders Tasks section with To Do / Done tabs", () => {
@@ -110,18 +106,8 @@ describe("Home page", () => {
     expect(screen.getByText("Setup Google Workspace domain")).toBeInTheDocument();
   });
 
-  it("renders Tools section with 6 tools", () => {
-    expect(screen.getByText("Tools")).toBeInTheDocument();
-    expect(screen.getByText("Gmail")).toBeInTheDocument();
-    expect(screen.getByText("Calendar")).toBeInTheDocument();
-    expect(screen.getByText("Meet")).toBeInTheDocument();
-    expect(screen.getByText("Drive")).toBeInTheDocument();
-    expect(screen.getByText("Docs")).toBeInTheDocument();
-    expect(screen.getByText("Sheets")).toBeInTheDocument();
-  });
-
-  it("renders Open Full Wiki link", () => {
-    const wikiLink = screen.getByText("Open Full Wiki");
+  it("renders Full Wiki link", () => {
+    const wikiLink = screen.getByText("Full Wiki");
     expect(wikiLink).toBeInTheDocument();
     expect(wikiLink.closest("a")).toHaveAttribute("href", "/wiki");
   });

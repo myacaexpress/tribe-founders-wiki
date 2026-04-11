@@ -19,12 +19,12 @@ describe("Login page", () => {
     expect(screen.getByText("Be")).toBeInTheDocument();
   });
 
-  it("renders FOUNDERS — FLORIDA subtitle", () => {
-    expect(screen.getByText("FOUNDERS — FLORIDA")).toBeInTheDocument();
+  it("renders Trifecta Founders subtitle", () => {
+    expect(screen.getByText("Trifecta Founders")).toBeInTheDocument();
   });
 
   it("renders password input", () => {
-    const input = screen.getByLabelText("Password");
+    const input = screen.getByPlaceholderText("Enter password");
     expect(input).toBeInTheDocument();
     expect(input).toHaveAttribute("type", "password");
   });
@@ -33,7 +33,7 @@ describe("Login page", () => {
     expect(screen.getByText("Enter")).toBeInTheDocument();
   });
 
-  it("password input has placeholder text", () => {
-    expect(screen.getByPlaceholderText("Enter password")).toBeInTheDocument();
+  it("renders Password label", () => {
+    expect(screen.getByText("Password")).toBeInTheDocument();
   });
 });
