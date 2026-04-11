@@ -25,11 +25,11 @@ interface ProcessingResult {
 
 type PageState = "idle" | "requesting" | "recording" | "processing" | "review" | "saving" | "saved" | "briefing" | "error";
 
-// Founder email addresses — used for Google Calendar invite attendees
+// Founder email addresses — auto-invited to every meeting
 const FOUNDER_EMAILS: Record<string, string> = {
-  shawn: "shawn@myacaexpress.com",
-  mark: "mark@myaca.com",       // update if different
-  michael: "michael@myaca.com", // update if different
+  shawn: "myacaexpress@gmail.com",
+  mark: "Markfernandez9504@gmail.com",
+  michael: "Pro.mentum.solutions@gmail.com",
 };
 
 export default function MeetingPage() {
@@ -288,7 +288,52 @@ export default function MeetingPage() {
   };
 
   const startMeetingWithRecording = async () => {
+    // Start recording first (microphone access)
     await startRecording();
+
+    // Then create a Google Meet link and email founders
+    const selectedEmails = Object.entries(attendees)
+      .filter(([, selected]) => selected)
+      .map(([key]) => FOUNDER_EMAILS[key])
+      .filter(Boolean);
+
+    try {
+      const res = await fetch("/api/meeting/create-meet", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: meetingTitle || "Founders Meeting",
+          attendees: selectedEmails,
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data.meetLink) {
+          setMeetUrl(data.meetLink);
+          // Open Meet automatically
+          window.open(data.meetLink, "_blank");
+          return;
+        }
+      }
+    } catch (e) {
+      console.log("[Meeting] Calendar API unavailable, using fallback");
+    }
+
+    // Fallback: open a new Google Meet and send email invite manually
+    const meetLink = "https://meet.google.com/new";
+    window.open(meetLink, "_blank");
+
+    // Send email invite via mailto with all founder emails
+    if (selectedEmails.length > 0) {
+      const title = meetingTitle || "Founders Meeting";
+      const subject = encodeURIComponent(`Join: ${title}`);
+      const body = encodeURIComponent(
+        `Hey team,\n\nJoining a TriBe founders meeting now.\n\nI'll paste the Google Meet link once I'm in.\n\n— Sent from TriBe`
+      );
+      const to = selectedEmails.join(",");
+      window.open(`mailto:${to}?subject=${subject}&body=${body}`, "_self");
+    }
   };
 
   const copyMeetUrl = async () => {
@@ -633,47 +678,67 @@ export default function MeetingPage() {
               <canvas ref={canvasRef} width={300} height={70} style={{ width: "100%", height: "auto", display: "block" }} />
             </div>
 
-            {/* Google Meet */}
+            {/* Google Meet link */}
             <div style={glassStyle}>
-              <a
-                href="https://meet.google.com/new"
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{ ...btnTeal, display: "block", textAlign: "center", textDecoration: "none", marginBottom: 12 }}
-              >
-                Open Google Meet
-              </a>
-              <div style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", textAlign: "center", marginBottom: 10 }}>
-                Paste your Meet link below to share with attendees
-              </div>
-              <div style={{ display: "flex", gap: 8 }}>
-                <input
-                  type="text"
-                  value={meetUrl}
-                  onChange={(e) => setMeetUrl(e.target.value)}
-                  placeholder="meet.google.com/xxx-xxxx-xxx"
-                  style={{ ...inputStyle, marginBottom: 0, flex: 1 }}
-                />
-                {meetUrl && (
-                  <button
-                    onClick={copyMeetUrl}
-                    style={{ padding: "0 16px", background: "linear-gradient(135deg, #00c9a7, #00b4d8)", color: "#fff", border: "none", borderRadius: 14, fontSize: 13, fontWeight: 600, cursor: "pointer", flexShrink: 0 }}
-                  >
-                    {meetUrlCopied ? "Copied!" : "Copy"}
-                  </button>
-                )}
-              </div>
-              {meetUrl && (
-                <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
-                  <a href={getMeetShareLinks().mailto} style={{ flex: 1, padding: "10px", textAlign: "center", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 10, color: "rgba(255,255,255,0.7)", fontSize: 13, textDecoration: "none" }}>Email</a>
-                  <a href={getMeetShareLinks().imessage} style={{ flex: 1, padding: "10px", textAlign: "center", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 10, color: "rgba(255,255,255,0.7)", fontSize: 13, textDecoration: "none" }}>iMessage</a>
-                </div>
+              {meetUrl ? (
+                <>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,0.5)", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 10 }}>
+                    Meeting Link
+                  </div>
+                  <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
+                    <input
+                      type="text"
+                      value={meetUrl}
+                      readOnly
+                      style={{ ...inputStyle, marginBottom: 0, flex: 1, color: "#00c9a7" }}
+                    />
+                    <button
+                      onClick={copyMeetUrl}
+                      style={{ padding: "0 16px", background: "linear-gradient(135deg, #00c9a7, #00b4d8)", color: "#fff", border: "none", borderRadius: 14, fontSize: 13, fontWeight: 600, cursor: "pointer", flexShrink: 0 }}
+                    >
+                      {meetUrlCopied ? "Copied!" : "Copy"}
+                    </button>
+                  </div>
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <a
+                      href={meetUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ flex: 1, padding: "10px", textAlign: "center", background: "rgba(0,201,167,0.12)", border: "1px solid rgba(0,201,167,0.3)", borderRadius: 10, color: "#00c9a7", fontSize: 13, fontWeight: 600, textDecoration: "none" }}
+                    >
+                      Rejoin Meet
+                    </a>
+                    <a href={getMeetShareLinks().mailto} style={{ flex: 1, padding: "10px", textAlign: "center", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 10, color: "rgba(255,255,255,0.7)", fontSize: 13, textDecoration: "none" }}>
+                      Email Link
+                    </a>
+                    <a href={getMeetShareLinks().imessage} style={{ flex: 1, padding: "10px", textAlign: "center", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 10, color: "rgba(255,255,255,0.7)", fontSize: 13, textDecoration: "none" }}>
+                      iMessage
+                    </a>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", textAlign: "center", marginBottom: 10 }}>
+                    Paste your Meet link once you&apos;re in the call
+                  </div>
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <input
+                      type="text"
+                      value={meetUrl}
+                      onChange={(e) => setMeetUrl(e.target.value)}
+                      placeholder="meet.google.com/xxx-xxxx-xxx"
+                      style={{ ...inputStyle, marginBottom: 0, flex: 1 }}
+                    />
+                  </div>
+                </>
               )}
             </div>
 
-            <button onClick={stopRecording} style={btnCoral}>
-              End Meeting &amp; Transcribe
-            </button>
+            <div style={{ marginTop: 8 }}>
+              <button onClick={stopRecording} style={btnCoral}>
+                End Meeting &amp; Transcribe
+              </button>
+            </div>
           </>
         )}
 
