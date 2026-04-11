@@ -17,13 +17,45 @@ export interface HomeClientProps {
   businessStateSentence: string;
 }
 
-const glass = {
-  background: "rgba(255,255,255,0.14)",
-  backdropFilter: "blur(32px)",
-  WebkitBackdropFilter: "blur(32px)",
-  boxShadow: "0 4px 24px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.15)",
-  borderRadius: "20px",
-} as React.CSSProperties;
+const BG_GRADIENT = "linear-gradient(180deg, rgba(10,22,40,0.85) 0%, rgba(15,60,70,0.6) 20%, rgba(20,90,90,0.4) 35%, rgba(200,120,80,0.35) 55%, rgba(220,140,100,0.5) 70%, rgba(180,80,60,0.6) 85%, rgba(40,15,30,0.9) 100%)";
+
+const glass: React.CSSProperties = {
+  background: "rgba(255,255,255,0.08)",
+  backdropFilter: "blur(40px)",
+  WebkitBackdropFilter: "blur(40px)",
+  border: "1px solid rgba(255,255,255,0.12)",
+  borderRadius: 20,
+  padding: 24,
+  marginBottom: 16,
+  boxShadow: "0 4px 24px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.08)",
+};
+
+const tabActive: React.CSSProperties = {
+  flexShrink: 0,
+  padding: "10px 20px",
+  borderRadius: 50,
+  fontSize: 14,
+  fontWeight: 600,
+  border: "none",
+  whiteSpace: "nowrap",
+  background: "linear-gradient(135deg, #00c9a7, #00b4d8)",
+  color: "#fff",
+  boxShadow: "0 4px 15px rgba(0,201,167,0.3)",
+  cursor: "pointer",
+};
+
+const tabInactive: React.CSSProperties = {
+  flexShrink: 0,
+  padding: "10px 20px",
+  borderRadius: 50,
+  fontSize: 14,
+  fontWeight: 600,
+  whiteSpace: "nowrap",
+  background: "rgba(255,255,255,0.08)",
+  color: "rgba(255,255,255,0.6)",
+  border: "1px solid rgba(255,255,255,0.1)",
+  cursor: "pointer",
+};
 
 export default function HomeClient({
   radarItems,
@@ -37,68 +69,71 @@ export default function HomeClient({
   const todoItems = taskItems.filter((t) => !t.done);
   const doneItems = taskItems.filter((t) => t.done);
 
-  const getFounderColor = (founder?: string) => {
+  const founderColor = (founder?: string): string => {
     switch (founder) {
-      case "shawn":  return "text-[#00c9a7]";
-      case "mark":   return "text-[#ff7b6b]";
-      case "michael":return "text-[#b8c8b0]";
-      default:       return "text-white/60";
+      case "shawn":   return "#00c9a7";
+      case "mark":    return "#ff6b5a";
+      case "michael": return "#b8c8b0";
+      default:        return "rgba(255,255,255,0.5)";
     }
   };
 
-  const getStatusBadge = (status: string) => {
+  const statusBadgeStyle = (status: string): React.CSSProperties => {
     switch (status) {
-      case "raised":    return "bg-amber-400/20 text-amber-300";
-      case "discussed": return "bg-sky-400/20 text-sky-300";
-      case "decided":   return "bg-[#00c9a7]/20 text-[#00c9a7]";
-      case "executing": return "bg-indigo-400/20 text-indigo-300";
-      default:          return "bg-emerald-400/20 text-emerald-300";
+      case "raised":    return { background: "rgba(251,191,36,0.15)",  color: "#fbbf24", border: "1px solid rgba(251,191,36,0.3)" };
+      case "discussed": return { background: "rgba(56,189,248,0.15)",  color: "#38bdf8", border: "1px solid rgba(56,189,248,0.3)" };
+      case "decided":   return { background: "rgba(0,201,167,0.15)",   color: "#00c9a7", border: "1px solid rgba(0,201,167,0.3)" };
+      case "executing": return { background: "rgba(129,140,248,0.15)", color: "#818cf8", border: "1px solid rgba(129,140,248,0.3)" };
+      default:          return { background: "rgba(52,211,153,0.15)",  color: "#34d399", border: "1px solid rgba(52,211,153,0.3)" };
     }
   };
 
   return (
-    <div
-      className="pb-24 px-5"
-      style={{
-        minHeight: "100vh",
-        backgroundImage: `linear-gradient(175deg, rgba(10,46,56,0.9) 0%, rgba(26,74,74,0.8) 25%, rgba(45,107,90,0.7) 40%, rgba(199,106,74,0.7) 65%, rgba(232,149,106,0.6) 80%, rgba(42,26,46,0.92) 100%), url('/bg-sunset.jpg')`,
+    <div style={{ position: "relative", minHeight: "100vh", overflowX: "hidden" }}>
+
+      {/* Fixed scenic background */}
+      <div style={{
+        position: "fixed",
+        inset: 0,
+        zIndex: 0,
+        backgroundImage: `${BG_GRADIENT}, url('/bg-sunset.jpg')`,
         backgroundSize: "cover",
         backgroundPosition: "center",
-        backgroundAttachment: "fixed",
-      }}
-    >
-      <div className="max-w-lg mx-auto py-8 space-y-5">
+      }} />
 
-        {/* Logo header */}
-        <div className="text-center pt-2 pb-2">
-          <h1 className="text-5xl font-bold font-serif">
-            <span className="text-white">Tri</span>
-            <span className="text-[#ff7b6b]">Be</span>
-          </h1>
-          <p className="text-sm font-semibold text-white/70 tracking-widest mt-2">
-            FOUNDERS — FLORIDA
-          </p>
+      {/* Content */}
+      <div style={{ position: "relative", zIndex: 1, maxWidth: 420, margin: "0 auto", padding: "48px 20px 100px" }}>
+
+        {/* Logo */}
+        <div style={{ textAlign: "center", marginBottom: 32 }}>
+          <div style={{ fontSize: 36, fontWeight: 800, lineHeight: 1 }}>
+            <span style={{ color: "#fff" }}>Tri</span>
+            <span style={{ color: "#ff6b5a" }}>Be</span>
+          </div>
+          <div style={{ fontSize: 11, letterSpacing: 3, textTransform: "uppercase", color: "rgba(255,255,255,0.5)", marginTop: 6 }}>
+            Founders — Florida
+          </div>
         </div>
 
-        {/* State sentence card */}
-        <div className="border border-white/25 p-6" style={glass}>
-          <p className="text-white font-serif text-lg leading-relaxed">
+        {/* State sentence */}
+        <div style={glass}>
+          <p style={{ fontSize: 15, lineHeight: 1.6, color: "rgba(255,255,255,0.75)", margin: 0 }}>
             {businessStateSentence}
           </p>
         </div>
 
-        {/* Action buttons — scrollable pill row */}
-        <div className="flex gap-3 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
+        {/* Action buttons */}
+        <div style={{ display: "flex", gap: 8, overflowX: "auto", padding: "4px 0", marginBottom: 16, scrollbarWidth: "none" }}>
           <a
             href="https://meet.google.com/new"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-none px-5 py-2.5 bg-[#00c9a7] text-white rounded-full font-bold text-sm whitespace-nowrap hover:opacity-90 transition-opacity"
+            style={{ flexShrink: 0, padding: "10px 20px", borderRadius: 50, fontSize: 14, fontWeight: 600, background: "linear-gradient(135deg, #00c9a7, #00b4d8)", color: "#fff", textDecoration: "none", whiteSpace: "nowrap", boxShadow: "0 4px 15px rgba(0,201,167,0.3)" }}
           >
             Meet
           </a>
           {[
-            { href: "/meeting", label: "Record" },
+            { href: "/meeting",  label: "Record" },
             { href: "/watchers", label: "Watchers" },
             { href: "/search",   label: "Search" },
             { href: "/wiki",     label: "Full Wiki" },
@@ -106,141 +141,123 @@ export default function HomeClient({
             <Link
               key={href}
               href={href}
-              className="flex-none px-5 py-2.5 border border-white/25 rounded-full font-semibold text-sm text-white whitespace-nowrap hover:bg-white/20 transition-colors"
-              style={{ background: "rgba(255,255,255,0.18)" }}
+              style={{ flexShrink: 0, padding: "10px 20px", borderRadius: 50, fontSize: 14, fontWeight: 600, background: "rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.1)", textDecoration: "none", whiteSpace: "nowrap" }}
             >
               {label}
             </Link>
           ))}
         </div>
 
-        {/* Radar card — each item is its own mini card */}
-        <div className="border border-white/25 p-6" style={glass}>
-          <h2 className="serif-heading text-xl mb-4 text-white font-bold">Radar</h2>
-          <div className="space-y-3">
-            {radarItems.map((item) => (
-              <div
-                key={item.id}
-                className="flex gap-3 p-4 rounded-xl border border-white/15"
-                style={{ background: "rgba(255,255,255,0.1)" }}
-              >
-                <div
-                  className={`w-2.5 h-2.5 rounded-full flex-shrink-0 mt-1.5 ${
-                    item.level === "red"   ? "bg-[#e85d4e]"
-                    : item.level === "amber" ? "bg-amber-400"
-                    : "bg-[#b8c8b0]"
-                  }`}
-                />
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-white leading-snug">{item.title}</p>
-                  {item.description && (
-                    <p className="text-sm text-white/60 mt-0.5">{item.description}</p>
-                  )}
-                  {item.daysUntil && (
-                    <p className="text-xs text-[#00c9a7] font-semibold mt-1">{item.daysUntil} days</p>
-                  )}
+        {/* Radar */}
+        <div style={glass}>
+          <div style={{ fontSize: 22, fontWeight: 700, color: "#fff", marginBottom: 16 }}>Radar</div>
+          {radarItems.map((item) => (
+            <div
+              key={item.id}
+              style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 14, padding: "16px 18px", marginBottom: 10, display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}
+            >
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <div style={{
+                    width: 8, height: 8, borderRadius: "50%", flexShrink: 0,
+                    background: item.level === "red" ? "#ff6b5a" : item.level === "amber" ? "#f59e0b" : "#b8c8b0",
+                  }} />
+                  <span style={{ fontSize: 15, fontWeight: 500, color: "rgba(255,255,255,0.9)" }}>{item.title}</span>
                 </div>
+                {item.description && (
+                  <div style={{ fontSize: 13, color: "rgba(255,255,255,0.45)", marginTop: 4, paddingLeft: 16 }}>{item.description}</div>
+                )}
               </div>
-            ))}
-          </div>
+              {item.daysUntil != null && (
+                <div style={{ fontSize: 14, fontWeight: 700, color: (item.daysUntil as number) <= 7 ? "#ff6b5a" : "#00c9a7", flexShrink: 0, marginLeft: 12 }}>
+                  {item.daysUntil}d
+                </div>
+              )}
+            </div>
+          ))}
         </div>
 
-        {/* Group Table card */}
-        <div className="border border-white/25 p-6" style={glass}>
-          <h2 className="serif-heading text-xl mb-4 text-white font-bold">Group Table</h2>
-          <div className="space-y-3">
-            {groupTableItems.map((item) => (
-              <div
-                key={item.id}
-                className="p-4 rounded-xl border border-white/15"
-                style={{ background: "rgba(255,255,255,0.1)" }}
-              >
-                <div className="flex items-start justify-between gap-2 mb-1">
-                  <p className="font-semibold text-white leading-snug">{item.title}</p>
-                  <span className={`text-xs font-semibold px-2.5 py-1 rounded-full flex-shrink-0 ${getStatusBadge(item.status)}`}>
-                    {item.status}
-                  </span>
-                </div>
-                <p className="text-xs text-white/50">{item.owner}</p>
+        {/* Group Table */}
+        <div style={glass}>
+          <div style={{ fontSize: 22, fontWeight: 700, color: "#fff", marginBottom: 16 }}>Group Table</div>
+          {groupTableItems.map((item) => (
+            <div
+              key={item.id}
+              style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 14, padding: "16px 18px", marginBottom: 10 }}
+            >
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12, marginBottom: 4 }}>
+                <span style={{ fontSize: 15, fontWeight: 500, color: "rgba(255,255,255,0.9)" }}>{item.title}</span>
+                <span style={{
+                  ...statusBadgeStyle(item.status),
+                  fontSize: 11, fontWeight: 700, padding: "3px 10px", borderRadius: 50,
+                  flexShrink: 0, textTransform: "capitalize",
+                }}>
+                  {item.status}
+                </span>
               </div>
-            ))}
-          </div>
+              <div style={{ fontSize: 13, color: "rgba(255,255,255,0.45)" }}>{item.owner}</div>
+            </div>
+          ))}
         </div>
 
-        {/* Lanes card */}
-        <div className="border border-white/25 p-6" style={glass}>
-          <h2 className="serif-heading text-xl mb-4 text-white font-bold">Lanes</h2>
-          <div className="space-y-5">
-            {[
-              { key: "shawn",   label: "Shawn",   color: "#00c9a7", items: laneItems.shawn },
-              { key: "mark",    label: "Mark",    color: "#ff7b6b", items: laneItems.mark },
-              { key: "michael", label: "Michael", color: "#b8c8b0", items: laneItems.michael },
-            ].map(({ key, label, color, items }) => (
-              <div key={key}>
-                <h3 className="text-sm font-bold mb-2" style={{ color }}>{label}</h3>
-                <div className="space-y-2 pl-4 border-l-2" style={{ borderColor: color }}>
-                  {items?.map((lane) => (
-                    <div key={lane.id}>
-                      <p className="font-medium text-white text-sm">{lane.title}</p>
-                      <p className="text-xs text-white/60">{lane.description}</p>
-                    </div>
-                  ))}
-                </div>
+        {/* Lanes */}
+        <div style={glass}>
+          <div style={{ fontSize: 22, fontWeight: 700, color: "#fff", marginBottom: 16 }}>Lanes</div>
+          {[
+            { key: "shawn",   label: "Shawn",   color: "#00c9a7", items: laneItems.shawn },
+            { key: "mark",    label: "Mark",    color: "#ff6b5a", items: laneItems.mark },
+            { key: "michael", label: "Michael", color: "#b8c8b0", items: laneItems.michael },
+          ].map(({ key, label, color, items }) => (
+            <div key={key} style={{ marginBottom: 20 }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color, marginBottom: 8 }}>{label}</div>
+              <div style={{ paddingLeft: 16, borderLeft: `2px solid ${color}` }}>
+                {items?.map((lane) => (
+                  <div key={lane.id} style={{ marginBottom: 10 }}>
+                    <div style={{ fontSize: 14, fontWeight: 500, color: "rgba(255,255,255,0.85)" }}>{lane.title}</div>
+                    <div style={{ fontSize: 13, color: "rgba(255,255,255,0.45)", marginTop: 2 }}>{lane.description}</div>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
 
-        {/* Tasks card */}
-        <div className="border border-white/25 p-6" style={glass}>
-          <h2 className="serif-heading text-xl mb-4 text-white font-bold">Tasks</h2>
-          {/* Tab row — pill buttons, scrollable */}
-          <div className="flex gap-2 mb-4 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
+        {/* Tasks */}
+        <div style={glass}>
+          <div style={{ fontSize: 22, fontWeight: 700, color: "#fff", marginBottom: 16 }}>Tasks</div>
+          <div style={{ display: "flex", gap: 8, overflowX: "auto", padding: "4px 0", marginBottom: 16, scrollbarWidth: "none" }}>
             {(["todo", "done"] as const).map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className="flex-none px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-all"
-                style={activeTab === tab
-                  ? { background: "#00c9a7", color: "#fff" }
-                  : { background: "rgba(255,255,255,0.12)", color: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.2)" }
-                }
-              >
+              <button key={tab} onClick={() => setActiveTab(tab)} style={activeTab === tab ? tabActive : tabInactive}>
                 {tab === "todo" ? `To Do (${todoItems.length})` : `Done (${doneItems.length})`}
               </button>
             ))}
           </div>
-          <div className="space-y-2">
-            {(activeTab === "todo" ? todoItems : doneItems).map((task) => (
-              <div
-                key={task.id}
-                className="flex items-center gap-3 p-3.5 rounded-xl border border-white/15"
-                style={{ background: "rgba(255,255,255,0.1)" }}
-              >
-                <input type="checkbox" checked={task.done} readOnly className="w-4 h-4 flex-shrink-0" />
-                <p className={`text-sm font-medium ${getFounderColor(task.founder)}`}>{task.title}</p>
-              </div>
-            ))}
-          </div>
+          {(activeTab === "todo" ? todoItems : doneItems).map((task) => (
+            <div
+              key={task.id}
+              style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 12, marginBottom: 8 }}
+            >
+              <input type="checkbox" checked={task.done} readOnly style={{ width: 16, height: 16, flexShrink: 0, accentColor: "#00c9a7" }} />
+              <span style={{ fontSize: 14, fontWeight: 500, color: founderColor(task.founder) }}>{task.title}</span>
+            </div>
+          ))}
         </div>
 
-        {/* This Week timeline card */}
-        <div className="border border-white/25 p-6" style={glass}>
-          <h2 className="serif-heading text-xl mb-4 text-white font-bold">This Week</h2>
-          <div className="relative pl-6">
-            <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-white/20" />
-            <div className="space-y-4">
-              {[
-                { color: "#e85d4e", text: "April 12: Carrier meeting (Humana)" },
-                { color: "#00c9a7", text: "April 14: Tech stack decision" },
-                { color: "#b8c8b0", text: "April 15: Financial model review" },
-              ].map(({ color, text }) => (
-                <div key={text} className="relative">
-                  <div className="absolute -left-[1.35rem] top-1 w-3 h-3 rounded-full" style={{ background: color }} />
-                  <p className="font-semibold text-white">{text}</p>
-                </div>
-              ))}
-            </div>
+        {/* This Week */}
+        <div style={{ ...glass, marginBottom: 0 }}>
+          <div style={{ fontSize: 22, fontWeight: 700, color: "#fff", marginBottom: 16 }}>This Week</div>
+          <div style={{ position: "relative", paddingLeft: 24 }}>
+            <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 2, background: "rgba(255,255,255,0.15)" }} />
+            {[
+              { color: "#ff6b5a", text: "April 12: Carrier meeting (Humana)" },
+              { color: "#00c9a7", text: "April 14: Tech stack decision" },
+              { color: "#b8c8b0", text: "April 15: Financial model review" },
+            ].map(({ color, text }) => (
+              <div key={text} style={{ position: "relative", marginBottom: 16 }}>
+                <div style={{ position: "absolute", left: -30, top: 4, width: 12, height: 12, borderRadius: "50%", background: color }} />
+                <div style={{ fontSize: 14, fontWeight: 500, color: "rgba(255,255,255,0.85)" }}>{text}</div>
+              </div>
+            ))}
           </div>
         </div>
 
@@ -249,7 +266,13 @@ export default function HomeClient({
       {/* FAB */}
       <Link
         href="/add"
-        className="fixed bottom-8 right-6 w-14 h-14 bg-[#e85d4e] text-white rounded-full flex items-center justify-center font-bold text-xl hover:opacity-90 transition-opacity shadow-lg"
+        style={{
+          position: "fixed", bottom: 32, right: 24, width: 56, height: 56,
+          background: "linear-gradient(135deg, #ff6b5a, #ff8a65)", borderRadius: "50%",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          color: "#fff", fontSize: 24, fontWeight: 700, textDecoration: "none",
+          boxShadow: "0 4px 20px rgba(255,107,90,0.4)", zIndex: 50,
+        }}
       >
         +
       </Link>

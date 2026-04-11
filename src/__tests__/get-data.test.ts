@@ -24,9 +24,6 @@ describe("getData (unified data layer)", () => {
     expect(data.taskItems).toBeDefined();
     expect(data.taskItems.length).toBeGreaterThan(0);
 
-    expect(data.toolItems).toBeDefined();
-    expect(data.toolItems.length).toBe(6);
-
     expect(typeof data.businessStateSentence).toBe("string");
     expect(data.businessStateSentence.length).toBeGreaterThan(0);
   });

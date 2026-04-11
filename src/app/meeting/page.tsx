@@ -425,7 +425,7 @@ export default function MeetingPage() {
     const barWidth = width / 20;
     const data = waveformDataRef.current;
 
-    ctx.fillStyle = "rgba(255, 255, 255, 0.85)";
+    ctx.fillStyle = "rgba(0, 201, 167, 0.85)";
     for (let i = 0; i < 20; i++) {
       const index = Math.floor((i / 20) * data.length);
       const value = data[index] / 255;
@@ -444,53 +444,98 @@ export default function MeetingPage() {
     return `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
   };
 
-  const getItemColor = (type: string) => {
+  const itemColor = (type: string): string => {
     switch (type) {
-      case "task":     return "text-[#00c9a7]";
-      case "decision": return "text-[#ff7b6b]";
-      case "idea":     return "text-[#b8c8b0]";
-      default:         return "text-white/60";
+      case "task":     return "#00c9a7";
+      case "decision": return "#ff6b5a";
+      case "idea":     return "#b8c8b0";
+      default:         return "rgba(255,255,255,0.6)";
     }
   };
 
-  const getItemBadgeColor = (type: string) => {
+  const itemBadgeStyle = (type: string): React.CSSProperties => {
     switch (type) {
-      case "task":     return "bg-[#00c9a7]/20 text-[#00c9a7]";
-      case "decision": return "bg-[#ff7b6b]/20 text-[#ff7b6b]";
-      case "idea":     return "bg-[#b8c8b0]/20 text-[#b8c8b0]";
-      default:         return "bg-white/10 text-white/60";
+      case "task":     return { background: "rgba(0,201,167,0.15)",   color: "#00c9a7", border: "1px solid rgba(0,201,167,0.3)" };
+      case "decision": return { background: "rgba(255,107,90,0.15)",  color: "#ff6b5a", border: "1px solid rgba(255,107,90,0.3)" };
+      case "idea":     return { background: "rgba(184,200,176,0.15)", color: "#b8c8b0", border: "1px solid rgba(184,200,176,0.3)" };
+      default:         return { background: "rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.15)" };
     }
   };
 
-  const glassStyle = {
-    background: "rgba(255,255,255,0.14)",
-    backdropFilter: "blur(32px)",
-    WebkitBackdropFilter: "blur(32px)",
-    boxShadow: "0 4px 24px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.15)",
-    borderRadius: "20px",
-  } as React.CSSProperties;
+  const BG_GRADIENT = "linear-gradient(180deg, rgba(10,22,40,0.85) 0%, rgba(15,60,70,0.6) 20%, rgba(20,90,90,0.4) 35%, rgba(200,120,80,0.35) 55%, rgba(220,140,100,0.5) 70%, rgba(180,80,60,0.6) 85%, rgba(40,15,30,0.9) 100%)";
+
+  const glassStyle: React.CSSProperties = {
+    background: "rgba(255,255,255,0.08)",
+    backdropFilter: "blur(40px)",
+    WebkitBackdropFilter: "blur(40px)",
+    border: "1px solid rgba(255,255,255,0.12)",
+    borderRadius: 20,
+    padding: 24,
+    marginBottom: 16,
+    boxShadow: "0 4px 24px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.08)",
+  };
+
+  const btnTeal: React.CSSProperties = {
+    display: "block", width: "100%", padding: "16px 24px", border: "none",
+    borderRadius: 50, fontSize: 16, fontWeight: 700,
+    background: "linear-gradient(135deg, #00c9a7, #00b4d8)", color: "#fff",
+    boxShadow: "0 4px 20px rgba(0,201,167,0.3)", cursor: "pointer",
+  };
+
+  const btnCoral: React.CSSProperties = {
+    display: "block", width: "100%", padding: "16px 24px", border: "none",
+    borderRadius: 50, fontSize: 16, fontWeight: 700,
+    background: "linear-gradient(135deg, #ff6b5a, #ff8a65)", color: "#fff",
+    boxShadow: "0 4px 20px rgba(255,107,90,0.3)", cursor: "pointer",
+  };
+
+  const btnGhost: React.CSSProperties = {
+    display: "block", width: "100%", padding: "14px 24px",
+    border: "1px solid rgba(255,255,255,0.15)", borderRadius: 50,
+    background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.7)",
+    fontSize: 15, fontWeight: 600, cursor: "pointer",
+  };
+
+  const inputStyle: React.CSSProperties = {
+    width: "100%", padding: "14px 18px",
+    background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)",
+    borderRadius: 14, color: "#fff", fontSize: 15, outline: "none",
+    boxSizing: "border-box",
+  };
+
+  const spinnerStyle: React.CSSProperties = {
+    width: 48, height: 48, borderRadius: "50%",
+    border: "3px solid rgba(0,201,167,0.2)",
+    borderTopColor: "#00c9a7",
+    animation: "spin 0.8s linear infinite",
+  };
 
   return (
-    <div
-      className="pb-24 px-5"
-      style={{
-        minHeight: "100vh",
-        backgroundImage: `linear-gradient(175deg, rgba(10,46,56,0.9) 0%, rgba(26,74,74,0.8) 25%, rgba(45,107,90,0.7) 40%, rgba(199,106,74,0.7) 65%, rgba(232,149,106,0.6) 80%, rgba(42,26,46,0.92) 100%), url('/bg-sunset.jpg')`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundAttachment: "fixed",
-      }}
-    >
-      <div className="max-w-lg mx-auto py-8">
+    <div style={{ position: "relative", minHeight: "100vh", overflowX: "hidden" }}>
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } } @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }`}</style>
+
+      {/* Fixed scenic background */}
+      <div style={{
+        position: "fixed", inset: 0, zIndex: 0,
+        backgroundImage: `${BG_GRADIENT}, url('/bg-sunset.jpg')`,
+        backgroundSize: "cover", backgroundPosition: "center",
+      }} />
+
+      {/* Content */}
+      <div style={{ position: "relative", zIndex: 1, maxWidth: 420, margin: "0 auto", padding: "48px 20px 100px" }}>
 
         {/* Logo + back */}
-        <div className="text-center mb-6">
-          <span className="text-3xl font-bold font-serif text-white">Tri</span>
-          <span className="text-3xl font-bold font-serif text-[#ff7b6b]">Be</span>
-          <p className="text-xs font-semibold text-white/50 tracking-widest mt-1">FOUNDERS — FLORIDA</p>
+        <div style={{ textAlign: "center", marginBottom: 8 }}>
+          <div style={{ fontSize: 36, fontWeight: 800, lineHeight: 1 }}>
+            <span style={{ color: "#fff" }}>Tri</span>
+            <span style={{ color: "#ff6b5a" }}>Be</span>
+          </div>
+          <div style={{ fontSize: 11, letterSpacing: 3, textTransform: "uppercase", color: "rgba(255,255,255,0.5)", marginTop: 6 }}>
+            Founders — Florida
+          </div>
         </div>
-        <div className="mb-6">
-          <Link href="/" className="text-white/60 hover:text-white transition-colors text-sm">
+        <div style={{ marginBottom: 32 }}>
+          <Link href="/" style={{ fontSize: 14, color: "rgba(255,255,255,0.5)", textDecoration: "none" }}>
             ← Back
           </Link>
         </div>
@@ -498,264 +543,176 @@ export default function MeetingPage() {
         {/* IDLE STATE */}
         {state === "idle" && (
           <>
-            <h1 className="serif-heading text-3xl mb-8 text-white font-bold">
-              Record Meeting
-            </h1>
+            <div style={{ fontSize: 22, fontWeight: 700, color: "#fff", marginBottom: 24 }}>Record Meeting</div>
 
-            <div className="space-y-5">
-              {/* Meeting title input */}
-              <div className="rounded-2xl border border-white/30 p-5" style={glassStyle}>
-                <label className="block text-sm font-medium text-white/80 mb-2">
-                  Meeting Title (optional)
-                </label>
-                <input
-                  type="text"
-                  value={meetingTitle}
-                  onChange={(e) => setMeetingTitle(e.target.value)}
-                  placeholder="e.g., Weekly standup, Carrier meeting..."
-                  className="w-full px-4 py-3 rounded-xl text-white placeholder:text-white/40 focus:outline-none focus:border-white/60 transition-all bg-white/10 border border-white/30"
-                />
+            {/* Meeting title input */}
+            <div style={glassStyle}>
+              <div style={{ fontSize: 13, fontWeight: 500, color: "rgba(255,255,255,0.6)", marginBottom: 10 }}>
+                Meeting Title (optional)
               </div>
+              <input
+                type="text"
+                value={meetingTitle}
+                onChange={(e) => setMeetingTitle(e.target.value)}
+                placeholder="e.g., Weekly standup, Carrier meeting..."
+                style={inputStyle}
+              />
+            </div>
 
-              {/* Attendees checkboxes */}
-              <div className="rounded-2xl border border-white/30 p-5" style={glassStyle}>
-                <label className="block text-sm font-medium text-white/80 mb-3">
-                  Attendees
-                </label>
-                <div className="space-y-3">
-                  {[
-                    { key: "shawn" as const, label: "Shawn", color: "text-[#00c9a7]" },
-                    { key: "mark" as const,  label: "Mark",  color: "text-[#ff7b6b]" },
-                    { key: "michael" as const, label: "Michael", color: "text-[#b8c8b0]" },
-                  ].map(({ key, label, color }) => (
-                    <label key={key} className="flex items-center gap-3 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={attendees[key]}
-                        onChange={() => handleAttendeeChange(key)}
-                        className="w-4 h-4 cursor-pointer"
-                      />
-                      <span className={`font-semibold ${color}`}>{label}</span>
-                    </label>
-                  ))}
-                </div>
+            {/* Attendees */}
+            <div style={glassStyle}>
+              <div style={{ fontSize: 13, fontWeight: 500, color: "rgba(255,255,255,0.6)", marginBottom: 14 }}>Attendees</div>
+              <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                {([
+                  { key: "shawn" as const,   label: "Shawn",   color: "#00c9a7" },
+                  { key: "mark" as const,    label: "Mark",    color: "#ff6b5a" },
+                  { key: "michael" as const, label: "Michael", color: "#b8c8b0" },
+                ] as const).map(({ key, label, color }) => (
+                  <button
+                    key={key}
+                    onClick={() => handleAttendeeChange(key)}
+                    style={{
+                      display: "flex", alignItems: "center", gap: 8,
+                      padding: "8px 14px",
+                      background: attendees[key] ? `rgba(${color === "#00c9a7" ? "0,201,167" : color === "#ff6b5a" ? "255,107,90" : "184,200,176"},0.12)` : "rgba(255,255,255,0.05)",
+                      border: `1px solid ${attendees[key] ? `${color}44` : "rgba(255,255,255,0.1)"}`,
+                      borderRadius: 50, fontSize: 13, fontWeight: 500,
+                      color: attendees[key] ? color : "rgba(255,255,255,0.4)",
+                      cursor: "pointer",
+                    }}
+                  >
+                    <span style={{ width: 14, height: 14, borderRadius: "50%", border: `2px solid ${attendees[key] ? color : "rgba(255,255,255,0.2)"}`, background: attendees[key] ? color : "transparent", display: "inline-block" }} />
+                    {label}
+                  </button>
+                ))}
               </div>
+            </div>
 
-              {/* Action buttons */}
-              <div className="flex flex-col gap-3">
-                <button
-                  onClick={startMeetingWithRecording}
-                  className="w-full py-4 px-6 bg-[#00c9a7] text-white rounded-full font-bold text-lg hover:opacity-90 transition-opacity text-center"
-                >
-                  Start Meeting + Record
-                </button>
-                <button
-                  onClick={startRecording}
-                  className="w-full py-3 px-6 border border-white/30 text-white rounded-full font-semibold hover:bg-white/10 transition-colors"
-                  style={{ background: "rgba(255,255,255,0.15)" }}
-                >
-                  Record Audio Only
-                </button>
-                <button
-                  onClick={generateBrief}
-                  className="w-full py-3 px-6 border border-white/20 text-white/70 rounded-full font-semibold hover:bg-white/10 transition-colors"
-                  style={{ background: "rgba(255,255,255,0.10)" }}
-                >
-                  Generate Pre-Meeting Brief
-                </button>
-              </div>
+            {/* Action buttons */}
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              <button onClick={startMeetingWithRecording} style={btnTeal}>
+                Start Meeting + Record
+              </button>
+              <button onClick={startRecording} style={btnGhost}>
+                Record Audio Only
+              </button>
+              <button onClick={generateBrief} style={{ ...btnGhost, color: "rgba(255,255,255,0.5)", fontSize: 14 }}>
+                Generate Pre-Meeting Brief
+              </button>
             </div>
           </>
         )}
 
         {/* REQUESTING STATE */}
         {state === "requesting" && (
-          <>
-            <h1 className="serif-heading text-3xl mb-8 text-white font-bold">
-              Starting Recording
-            </h1>
-            <div className="flex flex-col items-center justify-center min-h-[400px] space-y-6">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#00c9a7]" />
-              <p className="text-lg text-white font-medium">Requesting microphone access...</p>
-              <p className="text-sm text-white/50 text-center px-4">Please allow microphone access when your browser prompts you</p>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: 400, gap: 20 }}>
+            <div style={spinnerStyle} />
+            <div style={{ fontSize: 18, fontWeight: 600, color: "#fff" }}>Requesting microphone...</div>
+            <div style={{ fontSize: 14, color: "rgba(255,255,255,0.5)", textAlign: "center", maxWidth: 280 }}>
+              Please allow microphone access when your browser prompts you
             </div>
-          </>
+          </div>
         )}
 
         {/* RECORDING STATE */}
         {state === "recording" && (
           <>
-            <h1 className="serif-heading text-3xl mb-8 text-white font-bold">
-              Meeting in Progress
-            </h1>
-
-            <div className="space-y-5">
-              {/* Recording indicator + timer */}
-              <div className="rounded-2xl border border-white/30 p-6 text-center" style={glassStyle}>
-                <div className="flex items-center justify-center gap-3 mb-3">
-                  <div className="w-3 h-3 bg-[#e85d4e] rounded-full animate-pulse" />
-                  <span className="text-[#ff7b6b] font-semibold tracking-wide">RECORDING</span>
-                </div>
-                <p className="text-5xl font-mono font-bold text-white">
-                  {formatTime(recordingTime)}
-                </p>
+            {/* Recording indicator */}
+            <div style={{ ...glassStyle, textAlign: "center" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, marginBottom: 16 }}>
+                <div style={{ width: 12, height: 12, borderRadius: "50%", background: "#ff6b5a", animation: "pulse 1.2s ease-in-out infinite" }} />
+                <span style={{ fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: 2, color: "#ff6b5a" }}>Recording</span>
               </div>
+              <div style={{ fontSize: 48, fontWeight: 700, color: "#fff", fontVariantNumeric: "tabular-nums" }}>
+                {formatTime(recordingTime)}
+              </div>
+            </div>
 
-              {/* Waveform visualizer */}
-              <div className="rounded-xl p-4 border border-white/20" style={{ background: "rgba(0,0,0,0.2)" }}>
-                <canvas
-                  ref={canvasRef}
-                  width={300}
-                  height={80}
-                  className="w-full"
-                  style={{ maxWidth: "100%", height: "auto" }}
+            {/* Waveform */}
+            <div style={{ background: "rgba(0,0,0,0.25)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 16, padding: 16, marginBottom: 16 }}>
+              <canvas ref={canvasRef} width={300} height={70} style={{ width: "100%", height: "auto", display: "block" }} />
+            </div>
+
+            {/* Google Meet */}
+            <div style={glassStyle}>
+              <a
+                href="https://meet.google.com/new"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ ...btnTeal, display: "block", textAlign: "center", textDecoration: "none", marginBottom: 12 }}
+              >
+                Open Google Meet
+              </a>
+              <div style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", textAlign: "center", marginBottom: 10 }}>
+                Paste your Meet link below to share with attendees
+              </div>
+              <div style={{ display: "flex", gap: 8 }}>
+                <input
+                  type="text"
+                  value={meetUrl}
+                  onChange={(e) => setMeetUrl(e.target.value)}
+                  placeholder="meet.google.com/xxx-xxxx-xxx"
+                  style={{ ...inputStyle, marginBottom: 0, flex: 1 }}
                 />
-              </div>
-
-              {/* Google Meet */}
-              <div className="rounded-2xl border border-white/30 p-5 space-y-3" style={glassStyle}>
-                <a
-                  href="https://meet.google.com/new"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block w-full py-3 px-6 bg-[#00c9a7] text-white rounded-full font-bold text-center hover:opacity-90 transition-opacity"
-                >
-                  Open Google Meet
-                </a>
-                <p className="text-xs text-white/50 text-center">
-                  Paste your Meet link below to share with attendees
-                </p>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={meetUrl}
-                    onChange={(e) => setMeetUrl(e.target.value)}
-                    placeholder="meet.google.com/xxx-xxxx-xxx"
-                    className="flex-1 px-3 py-2 text-sm rounded-xl text-white placeholder:text-white/40 focus:outline-none focus:border-white/60 bg-white/10 border border-white/30"
-                  />
-                  {meetUrl && (
-                    <button
-                      onClick={copyMeetUrl}
-                      className="px-4 py-2 text-sm bg-[#00c9a7] text-white rounded-full font-semibold hover:opacity-90 transition-opacity whitespace-nowrap"
-                    >
-                      {meetUrlCopied ? "Copied!" : "Copy"}
-                    </button>
-                  )}
-                </div>
                 {meetUrl && (
-                  <div className="flex gap-2">
-                    <a
-                      href={getMeetShareLinks().mailto}
-                      className="flex-1 py-2 px-3 text-sm text-center border border-white/20 rounded-full text-white/80 hover:bg-white/10 transition-colors"
-                    >
-                      Email
-                    </a>
-                    <a
-                      href={getMeetShareLinks().imessage}
-                      className="flex-1 py-2 px-3 text-sm text-center border border-white/20 rounded-full text-white/80 hover:bg-white/10 transition-colors"
-                    >
-                      iMessage
-                    </a>
-                  </div>
+                  <button
+                    onClick={copyMeetUrl}
+                    style={{ padding: "0 16px", background: "linear-gradient(135deg, #00c9a7, #00b4d8)", color: "#fff", border: "none", borderRadius: 14, fontSize: 13, fontWeight: 600, cursor: "pointer", flexShrink: 0 }}
+                  >
+                    {meetUrlCopied ? "Copied!" : "Copy"}
+                  </button>
                 )}
               </div>
-
-              {/* Stop recording button */}
-              <button
-                onClick={stopRecording}
-                className="w-full py-4 px-6 bg-[#e85d4e] text-white rounded-full font-bold text-lg hover:opacity-90 transition-opacity"
-              >
-                End Meeting &amp; Transcribe
-              </button>
+              {meetUrl && (
+                <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
+                  <a href={getMeetShareLinks().mailto} style={{ flex: 1, padding: "10px", textAlign: "center", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 10, color: "rgba(255,255,255,0.7)", fontSize: 13, textDecoration: "none" }}>Email</a>
+                  <a href={getMeetShareLinks().imessage} style={{ flex: 1, padding: "10px", textAlign: "center", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 10, color: "rgba(255,255,255,0.7)", fontSize: 13, textDecoration: "none" }}>iMessage</a>
+                </div>
+              )}
             </div>
+
+            <button onClick={stopRecording} style={btnCoral}>
+              End Meeting &amp; Transcribe
+            </button>
           </>
         )}
 
         {/* PROCESSING STATE */}
         {state === "processing" && (
-          <>
-            <h1 className="serif-heading text-3xl mb-8 text-white font-bold">
-              Processing
-            </h1>
-            <div className="space-y-6 flex flex-col items-center justify-center min-h-[400px]">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#00c9a7]" />
-              <p className="text-lg text-white font-medium">
-                {processingStep === "transcribing"
-                  ? "Transcribing audio..."
-                  : "Processing transcript..."}
-              </p>
-              <p className="text-sm text-white/50">This may take a moment</p>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: 400, gap: 20 }}>
+            <div style={spinnerStyle} />
+            <div style={{ fontSize: 18, fontWeight: 600, color: "#fff" }}>
+              {processingStep === "transcribing" ? "Transcribing audio..." : "Processing transcript..."}
             </div>
-          </>
+            <div style={{ fontSize: 14, color: "rgba(255,255,255,0.4)" }}>This may take a moment</div>
+          </div>
         )}
 
-        {/* BRIEFING STATE — loading */}
+        {/* BRIEFING loading */}
         {state === "briefing" && !briefContent && (
-          <>
-            <h1 className="serif-heading text-3xl mb-8 text-white font-bold">
-              Generating Brief
-            </h1>
-            <div className="space-y-6 flex flex-col items-center justify-center min-h-[400px]">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#00c9a7]" />
-              <p className="text-lg text-white font-medium">Pulling data from the wiki...</p>
-            </div>
-          </>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: 400, gap: 20 }}>
+            <div style={spinnerStyle} />
+            <div style={{ fontSize: 18, fontWeight: 600, color: "#fff" }}>Pulling data from the wiki...</div>
+          </div>
         )}
 
-        {/* BRIEFING STATE — content */}
+        {/* BRIEFING content */}
         {state === "briefing" && briefContent && (
           <>
-            <h1 className="serif-heading text-3xl mb-8 text-white font-bold">
-              Pre-Meeting Brief
-            </h1>
-            <div className="space-y-5">
-              <div className="rounded-2xl border border-white/30 p-6" style={glassStyle}>
-                <div className="prose prose-sm max-w-none">
-                  {briefContent.split("\n").map((line, i) => {
-                    if (line.startsWith("# "))
-                      return <h1 key={i} className="serif-heading text-xl mb-2 text-white">{line.replace("# ", "")}</h1>;
-                    if (line.startsWith("## "))
-                      return <h2 key={i} className="serif-heading text-lg mt-4 mb-2 text-[#00c9a7]">{line.replace("## ", "")}</h2>;
-                    if (line.startsWith("### "))
-                      return <h3 key={i} className="text-sm font-bold mt-3 mb-1 text-white capitalize">{line.replace("### ", "")}</h3>;
-                    if (line.startsWith("- [ ] "))
-                      return (
-                        <div key={i} className="flex items-start gap-2 ml-2 text-sm text-white/80">
-                          <span className="text-white/40 mt-0.5">&#9633;</span>
-                          <span>{line.replace("- [ ] ", "")}</span>
-                        </div>
-                      );
-                    if (line.startsWith("- "))
-                      return (
-                        <div key={i} className="flex items-start gap-2 ml-2 text-sm text-white/80">
-                          <span className="text-[#00c9a7] mt-0.5">&#8226;</span>
-                          <span>{line.replace("- ", "")}</span>
-                        </div>
-                      );
-                    if (line.startsWith("**"))
-                      return <p key={i} className="text-sm text-white/60">{line.replace(/\*\*/g, "")}</p>;
-                    if (line.trim() === "")
-                      return <div key={i} className="h-2" />;
-                    return <p key={i} className="text-sm text-white/80">{line}</p>;
-                  })}
-                </div>
-              </div>
-
-              <div className="flex flex-col gap-3">
-                <button
-                  onClick={() => { setBriefContent(""); setState("idle"); }}
-                  className="w-full py-4 px-6 bg-[#00c9a7] text-white rounded-full font-bold hover:opacity-90 transition-opacity"
-                >
-                  Ready — Start Recording
-                </button>
-                <button
-                  onClick={resetForm}
-                  className="w-full py-3 px-6 border border-white/30 text-white rounded-full font-semibold hover:bg-white/10 transition-colors"
-                  style={{ background: "rgba(255,255,255,0.15)" }}
-                >
-                  Back
-                </button>
-              </div>
+            <div style={{ fontSize: 22, fontWeight: 700, color: "#fff", marginBottom: 24 }}>Pre-Meeting Brief</div>
+            <div style={glassStyle}>
+              {briefContent.split("\n").map((line, i) => {
+                if (line.startsWith("# "))  return <div key={i} style={{ fontSize: 18, fontWeight: 700, color: "#fff", marginBottom: 8 }}>{line.replace("# ", "")}</div>;
+                if (line.startsWith("## ")) return <div key={i} style={{ fontSize: 16, fontWeight: 600, color: "#00c9a7", marginTop: 16, marginBottom: 6 }}>{line.replace("## ", "")}</div>;
+                if (line.startsWith("### ")) return <div key={i} style={{ fontSize: 14, fontWeight: 600, color: "rgba(255,255,255,0.85)", marginTop: 12, marginBottom: 4 }}>{line.replace("### ", "")}</div>;
+                if (line.startsWith("- ")) return <div key={i} style={{ display: "flex", gap: 8, fontSize: 14, color: "rgba(255,255,255,0.75)", marginBottom: 4, paddingLeft: 8 }}><span style={{ color: "#00c9a7" }}>•</span><span>{line.replace("- ", "")}</span></div>;
+                if (line.trim() === "") return <div key={i} style={{ height: 8 }} />;
+                return <div key={i} style={{ fontSize: 14, color: "rgba(255,255,255,0.7)", marginBottom: 4 }}>{line}</div>;
+              })}
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              <button onClick={() => { setBriefContent(""); setState("idle"); }} style={btnTeal}>Ready — Start Recording</button>
+              <button onClick={resetForm} style={btnGhost}>Back</button>
             </div>
           </>
         )}
@@ -763,255 +720,156 @@ export default function MeetingPage() {
         {/* ERROR STATE */}
         {state === "error" && (
           <>
-            <h1 className="serif-heading text-3xl mb-8 text-white font-bold">Error</h1>
-            <div className="space-y-5">
-              <div className="rounded-2xl border border-[#ff7b6b]/40 p-5" style={{ background: "rgba(232,93,78,0.15)" }}>
-                <p className="text-[#ff7b6b] font-medium">{errorMessage}</p>
-              </div>
-              <button
-                onClick={resetForm}
-                className="w-full py-4 px-6 bg-[#00c9a7] text-white rounded-full font-bold hover:opacity-90 transition-opacity"
-              >
-                Try Again
-              </button>
+            <div style={{ fontSize: 22, fontWeight: 700, color: "#fff", marginBottom: 24 }}>Error</div>
+            <div style={{ background: "rgba(255,107,90,0.12)", border: "1px solid rgba(255,107,90,0.3)", borderRadius: 16, padding: 20, marginBottom: 16 }}>
+              <div style={{ fontSize: 15, color: "#ff6b5a", lineHeight: 1.5 }}>{errorMessage}</div>
             </div>
+            <button onClick={resetForm} style={btnTeal}>Try Again</button>
           </>
         )}
 
         {/* REVIEW STATE */}
         {state === "review" && (
           <>
-            <h1 className="serif-heading text-3xl mb-2 text-white font-bold">
-              Review Meeting Items
-            </h1>
-            {summary && (
-              <p className="text-white/60 text-sm mb-6">{summary}</p>
-            )}
+            <div style={{ fontSize: 22, fontWeight: 700, color: "#fff", marginBottom: 8 }}>Review Meeting Items</div>
+            {summary && <div style={{ fontSize: 14, color: "rgba(255,255,255,0.55)", marginBottom: 24 }}>{summary}</div>}
 
-            <div className="space-y-6">
-              {/* Confirm All banner */}
-              {reviewItems.some((i) => i.status === "pending") && (
-                <div className="flex items-center justify-between rounded-2xl border border-white/30 p-4" style={glassStyle}>
-                  <div>
-                    <p className="text-sm font-medium text-white">
-                      {reviewItems.filter((i) => i.status === "pending").length} item{reviewItems.filter((i) => i.status === "pending").length !== 1 ? "s" : ""} pending
-                    </p>
-                    <p className="text-xs text-white/50">
-                      {reviewItems.filter((i) => i.status === "confirmed").length} confirmed · {reviewItems.filter((i) => i.status === "skipped").length} skipped
-                    </p>
+            {/* Confirm All banner */}
+            {reviewItems.some((i) => i.status === "pending") && (
+              <div style={{ ...glassStyle, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <div>
+                  <div style={{ fontSize: 14, fontWeight: 500, color: "#fff" }}>
+                    {reviewItems.filter((i) => i.status === "pending").length} pending
                   </div>
-                  <button
-                    onClick={confirmAll}
-                    className="px-4 py-2 bg-[#00c9a7] text-white text-sm font-bold rounded-full hover:opacity-90 transition-opacity"
-                  >
-                    Confirm All
-                  </button>
-                </div>
-              )}
-
-              {/* Item cards grouped by type */}
-              {(["task", "decision", "idea", "question"] as const).map((type) => {
-                const typeItems = reviewItems
-                  .map((item, idx) => ({ item, idx }))
-                  .filter(({ item }) => item.type === type);
-                if (typeItems.length === 0) return null;
-
-                return (
-                  <div key={type}>
-                    <h2 className="serif-heading text-lg mb-3 text-white font-bold capitalize">
-                      {type === "question" ? "Open Questions" : `${type}s`}
-                    </h2>
-                    <div className="space-y-3">
-                      {typeItems.map(({ item, idx }) => (
-                        <div
-                          key={idx}
-                          className="rounded-2xl border transition-all"
-                          style={{
-                            background: item.status === "confirmed"
-                              ? "rgba(0,201,167,0.15)"
-                              : item.status === "skipped"
-                              ? "rgba(255,255,255,0.04)"
-                              : "rgba(255,255,255,0.08)",
-                            borderColor: item.status === "confirmed"
-                              ? "rgba(0,201,167,0.5)"
-                              : item.status === "skipped"
-                              ? "rgba(255,255,255,0.1)"
-                              : "rgba(255,255,255,0.2)",
-                            opacity: item.status === "skipped" ? 0.6 : 1,
-                          }}
-                        >
-                          <div className="p-4">
-                            <div className="flex items-start gap-3">
-                              {/* Status indicator */}
-                              <div className="flex-shrink-0 mt-1">
-                                {item.status === "confirmed" ? (
-                                  <span className="inline-flex items-center justify-center w-5 h-5 bg-[#00c9a7] rounded-full text-white text-xs">&#10003;</span>
-                                ) : item.status === "skipped" ? (
-                                  <span className="inline-flex items-center justify-center w-5 h-5 bg-white/20 rounded-full text-white text-xs">&#8212;</span>
-                                ) : (
-                                  <span className="inline-flex items-center justify-center w-5 h-5 border-2 border-white/30 rounded-full" />
-                                )}
-                              </div>
-
-                              {/* Content */}
-                              <div className="flex-1 min-w-0">
-                                {item.isEditing ? (
-                                  <div className="space-y-2">
-                                    <textarea
-                                      value={item.editedContent ?? item.content}
-                                      onChange={(e) => updateReviewItem(idx, { editedContent: e.target.value })}
-                                      rows={2}
-                                      className="w-full px-3 py-2 rounded-xl text-white placeholder:text-white/40 focus:outline-none focus:border-white/60 bg-white/10 border border-white/30 text-sm"
-                                    />
-                                    {(item.type === "task" || item.type === "idea") && (
-                                      <div className="flex items-center gap-2">
-                                        <label className="text-xs text-white/50">
-                                          {item.type === "task" ? "Owner:" : "Speaker:"}
-                                        </label>
-                                        <select
-                                          value={item.editedOwner ?? item.owner ?? ""}
-                                          onChange={(e) => updateReviewItem(idx, { editedOwner: e.target.value })}
-                                          className="px-2 py-1 rounded-lg text-sm bg-white/10 border border-white/30 text-white"
-                                        >
-                                          <option value="">Unassigned</option>
-                                          <option value="shawn">Shawn</option>
-                                          <option value="mark">Mark</option>
-                                          <option value="michael">Michael</option>
-                                        </select>
-                                      </div>
-                                    )}
-                                  </div>
-                                ) : (
-                                  <>
-                                    <p className={`text-sm font-medium ${item.status === "skipped" ? "text-white/40 line-through" : "text-white"}`}>
-                                      {item.editedContent || item.content}
-                                    </p>
-                                    {(item.owner || item.editedOwner) && (
-                                      <p className="text-xs text-white/50 mt-1">
-                                        {item.type === "task" ? "Owner" : "Speaker"}:{" "}
-                                        <span className="capitalize">{item.editedOwner || item.owner}</span>
-                                      </p>
-                                    )}
-                                    {item.confidence && (
-                                      <span className={`inline-block text-xs px-1.5 py-0.5 rounded-full mt-1 ${item.confidence === "high" ? "bg-[#00c9a7]/20 text-[#00c9a7]" : "bg-amber-400/20 text-amber-300"}`}>
-                                        {item.confidence} confidence
-                                      </span>
-                                    )}
-                                  </>
-                                )}
-                              </div>
-
-                              {/* Badge */}
-                              <span className={`text-xs font-bold px-2 py-1 rounded-full flex-shrink-0 ${getItemBadgeColor(item.type)}`}>
-                                {item.type.charAt(0).toUpperCase() + item.type.slice(1)}
-                              </span>
-                            </div>
-
-                            {/* Action buttons */}
-                            {item.status !== "confirmed" && item.status !== "skipped" && (
-                              <div className="flex items-center gap-2 mt-3 ml-8">
-                                <button onClick={() => confirmItem(idx)} className="px-3 py-1.5 bg-[#00c9a7] text-white text-xs font-bold rounded-full hover:opacity-90 transition-opacity">
-                                  Confirm
-                                </button>
-                                <button onClick={() => toggleEdit(idx)} className="px-3 py-1.5 border border-white/30 text-white text-xs font-semibold rounded-full hover:bg-white/10 transition-colors">
-                                  {item.isEditing ? "Done" : "Edit"}
-                                </button>
-                                <button onClick={() => skipItem(idx)} className="px-3 py-1.5 text-white/40 text-xs font-semibold rounded-full hover:text-white/70 transition-colors">
-                                  Skip
-                                </button>
-                              </div>
-                            )}
-
-                            {/* Undo */}
-                            {(item.status === "confirmed" || item.status === "skipped") && (
-                              <div className="mt-2 ml-8">
-                                <button onClick={() => updateReviewItem(idx, { status: "pending" })} className="text-xs text-white/40 hover:text-white transition-colors">
-                                  Undo
-                                </button>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+                  <div style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", marginTop: 2 }}>
+                    {reviewItems.filter((i) => i.status === "confirmed").length} confirmed · {reviewItems.filter((i) => i.status === "skipped").length} skipped
                   </div>
-                );
-              })}
-
-              {/* Collapsible transcript */}
-              <details className="rounded-2xl border border-white/30 overflow-hidden" style={glassStyle}>
-                <summary className="p-4 cursor-pointer text-sm font-medium text-white/50 hover:text-white transition-colors">
-                  View Full Transcript
-                </summary>
-                <div className="px-4 pb-4">
-                  <p className="text-white/70 leading-relaxed whitespace-pre-wrap text-xs">
-                    {transcript}
-                  </p>
                 </div>
-              </details>
-
-              {/* Save / Reset buttons */}
-              <div className="flex flex-col gap-3">
-                {reviewItems.some((i) => i.status === "confirmed") && (
-                  <button
-                    onClick={saveConfirmed}
-                    className="w-full py-4 px-6 bg-[#00c9a7] text-white rounded-full font-bold hover:opacity-90 transition-opacity"
-                  >
-                    Save {reviewItems.filter((i) => i.status === "confirmed").length} Item{reviewItems.filter((i) => i.status === "confirmed").length !== 1 ? "s" : ""} to Wiki
-                  </button>
-                )}
-                <button
-                  onClick={resetForm}
-                  className="w-full py-3 px-6 border border-white/30 text-white rounded-full font-semibold hover:bg-white/10 transition-colors"
-                  style={{ background: "rgba(255,255,255,0.15)" }}
-                >
-                  Discard &amp; Start Over
+                <button onClick={confirmAll} style={{ padding: "10px 20px", background: "linear-gradient(135deg, #00c9a7, #00b4d8)", color: "#fff", border: "none", borderRadius: 50, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
+                  Confirm All
                 </button>
               </div>
+            )}
+
+            {/* Items grouped by type */}
+            {(["task", "decision", "idea", "question"] as const).map((type) => {
+              const typeItems = reviewItems.map((item, idx) => ({ item, idx })).filter(({ item }) => item.type === type);
+              if (typeItems.length === 0) return null;
+              return (
+                <div key={type} style={{ marginBottom: 24 }}>
+                  <div style={{ fontSize: 16, fontWeight: 700, color: "#fff", marginBottom: 12, textTransform: "capitalize" }}>
+                    {type === "question" ? "Open Questions" : `${type}s`}
+                  </div>
+                  {typeItems.map(({ item, idx }) => (
+                    <div key={idx} style={{
+                      background: item.status === "confirmed" ? "rgba(0,201,167,0.12)" : item.status === "skipped" ? "rgba(255,255,255,0.03)" : "rgba(255,255,255,0.06)",
+                      border: `1px solid ${item.status === "confirmed" ? "rgba(0,201,167,0.4)" : item.status === "skipped" ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.1)"}`,
+                      borderRadius: 16, padding: 16, marginBottom: 10,
+                      opacity: item.status === "skipped" ? 0.6 : 1,
+                    }}>
+                      <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                        <div style={{ width: 20, height: 20, borderRadius: "50%", flexShrink: 0, marginTop: 2, display: "flex", alignItems: "center", justifyContent: "center", background: item.status === "confirmed" ? "#00c9a7" : "transparent", border: item.status === "confirmed" ? "none" : "2px solid rgba(255,255,255,0.2)", fontSize: 11, color: "#fff" }}>
+                          {item.status === "confirmed" ? "✓" : item.status === "skipped" ? "–" : ""}
+                        </div>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          {item.isEditing ? (
+                            <div>
+                              <textarea
+                                value={item.editedContent ?? item.content}
+                                onChange={(e) => updateReviewItem(idx, { editedContent: e.target.value })}
+                                rows={2}
+                                style={{ ...inputStyle, fontSize: 14, marginBottom: 8, resize: "none" }}
+                              />
+                              {(item.type === "task" || item.type === "idea") && (
+                                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                  <span style={{ fontSize: 12, color: "rgba(255,255,255,0.4)" }}>{item.type === "task" ? "Owner:" : "Speaker:"}</span>
+                                  <select
+                                    value={item.editedOwner ?? item.owner ?? ""}
+                                    onChange={(e) => updateReviewItem(idx, { editedOwner: e.target.value })}
+                                    style={{ padding: "6px 10px", background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 8, color: "#fff", fontSize: 13 }}
+                                  >
+                                    <option value="">Unassigned</option>
+                                    <option value="shawn">Shawn</option>
+                                    <option value="mark">Mark</option>
+                                    <option value="michael">Michael</option>
+                                  </select>
+                                </div>
+                              )}
+                            </div>
+                          ) : (
+                            <>
+                              <div style={{ fontSize: 14, fontWeight: 500, color: item.status === "skipped" ? "rgba(255,255,255,0.35)" : "rgba(255,255,255,0.9)", textDecoration: item.status === "skipped" ? "line-through" : "none" }}>
+                                {item.editedContent || item.content}
+                              </div>
+                              {(item.owner || item.editedOwner) && (
+                                <div style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", marginTop: 4 }}>
+                                  {item.type === "task" ? "Owner" : "Speaker"}: <span style={{ textTransform: "capitalize" }}>{item.editedOwner || item.owner}</span>
+                                </div>
+                              )}
+                            </>
+                          )}
+                        </div>
+                        <span style={{ ...itemBadgeStyle(item.type), fontSize: 11, fontWeight: 700, padding: "3px 10px", borderRadius: 50, flexShrink: 0, textTransform: "capitalize" }}>
+                          {item.type}
+                        </span>
+                      </div>
+                      {item.status !== "confirmed" && item.status !== "skipped" && (
+                        <div style={{ display: "flex", gap: 8, marginTop: 12, paddingLeft: 32 }}>
+                          <button onClick={() => confirmItem(idx)} style={{ padding: "6px 14px", background: "linear-gradient(135deg, #00c9a7, #00b4d8)", color: "#fff", border: "none", borderRadius: 50, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>Confirm</button>
+                          <button onClick={() => toggleEdit(idx)} style={{ padding: "6px 14px", background: "rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.7)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 50, fontSize: 12, fontWeight: 600, cursor: "pointer" }}>{item.isEditing ? "Done" : "Edit"}</button>
+                          <button onClick={() => skipItem(idx)} style={{ padding: "6px 14px", background: "transparent", color: "rgba(255,255,255,0.35)", border: "none", borderRadius: 50, fontSize: 12, cursor: "pointer" }}>Skip</button>
+                        </div>
+                      )}
+                      {(item.status === "confirmed" || item.status === "skipped") && (
+                        <button onClick={() => updateReviewItem(idx, { status: "pending" })} style={{ marginTop: 8, marginLeft: 32, background: "none", border: "none", fontSize: 12, color: "rgba(255,255,255,0.3)", cursor: "pointer" }}>Undo</button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              );
+            })}
+
+            {/* Transcript */}
+            <details style={{ ...glassStyle, overflow: "hidden" }}>
+              <summary style={{ cursor: "pointer", fontSize: 13, color: "rgba(255,255,255,0.45)", padding: 4 }}>View Full Transcript</summary>
+              <div style={{ marginTop: 12, fontSize: 12, color: "rgba(255,255,255,0.6)", lineHeight: 1.7, whiteSpace: "pre-wrap" }}>{transcript}</div>
+            </details>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              {reviewItems.some((i) => i.status === "confirmed") && (
+                <button onClick={saveConfirmed} style={btnTeal}>
+                  Save {reviewItems.filter((i) => i.status === "confirmed").length} Item{reviewItems.filter((i) => i.status === "confirmed").length !== 1 ? "s" : ""} to Wiki
+                </button>
+              )}
+              <button onClick={resetForm} style={btnGhost}>Discard &amp; Start Over</button>
             </div>
           </>
         )}
 
         {/* SAVING STATE */}
         {state === "saving" && (
-          <>
-            <h1 className="serif-heading text-3xl mb-8 text-white font-bold">Saving to Wiki</h1>
-            <div className="space-y-6 flex flex-col items-center justify-center min-h-[400px]">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#00c9a7]" />
-              <p className="text-lg text-white font-medium">Writing items to the wiki...</p>
-            </div>
-          </>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: 400, gap: 20 }}>
+            <div style={spinnerStyle} />
+            <div style={{ fontSize: 18, fontWeight: 600, color: "#fff" }}>Writing items to the wiki...</div>
+          </div>
         )}
 
         {/* SAVED STATE */}
         {state === "saved" && (
           <>
-            <h1 className="serif-heading text-3xl mb-8 text-white font-bold">Meeting Complete</h1>
-            <div className="space-y-5">
-              <div className="rounded-2xl border border-[#00c9a7]/40 p-6 text-center" style={{ background: "rgba(0,201,167,0.15)" }}>
-                <div className="text-4xl mb-3 text-[#00c9a7]">&#10003;</div>
-                <p className="text-[#00c9a7] font-bold text-lg">{saveMessage}</p>
-                <p className="text-white/50 text-sm mt-2">Items committed to your GitHub wiki.</p>
-              </div>
-
-              <div className="flex flex-col gap-3">
-                <Link
-                  href="/"
-                  className="w-full py-4 px-6 bg-[#00c9a7] text-white rounded-full font-bold hover:opacity-90 transition-opacity text-center"
-                >
-                  Back to Home
-                </Link>
-                <button
-                  onClick={resetForm}
-                  className="w-full py-3 px-6 border border-white/30 text-white rounded-full font-semibold hover:bg-white/10 transition-colors"
-                  style={{ background: "rgba(255,255,255,0.15)" }}
-                >
-                  Record Another Meeting
-                </button>
-              </div>
+            <div style={{ fontSize: 22, fontWeight: 700, color: "#fff", marginBottom: 24 }}>Meeting Complete</div>
+            <div style={{ background: "rgba(0,201,167,0.12)", border: "1px solid rgba(0,201,167,0.3)", borderRadius: 20, padding: 32, textAlign: "center", marginBottom: 16 }}>
+              <div style={{ fontSize: 40, color: "#00c9a7", marginBottom: 12 }}>✓</div>
+              <div style={{ fontSize: 17, fontWeight: 700, color: "#00c9a7", marginBottom: 6 }}>{saveMessage}</div>
+              <div style={{ fontSize: 13, color: "rgba(255,255,255,0.45)" }}>Items committed to your GitHub wiki.</div>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              <Link href="/" style={{ ...btnTeal, textAlign: "center", textDecoration: "none" }}>Back to Home</Link>
+              <button onClick={resetForm} style={btnGhost}>Record Another Meeting</button>
             </div>
           </>
         )}
+
       </div>
     </div>
   );
