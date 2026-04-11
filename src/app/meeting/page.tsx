@@ -462,7 +462,7 @@ export default function MeetingPage() {
     }
   };
 
-  const BG_GRADIENT = "linear-gradient(180deg, rgba(10,22,40,0.85) 0%, rgba(15,60,70,0.6) 20%, rgba(20,90,90,0.4) 35%, rgba(200,120,80,0.35) 55%, rgba(220,140,100,0.5) 70%, rgba(180,80,60,0.6) 85%, rgba(40,15,30,0.9) 100%)";
+  const BG_GRADIENT = "linear-gradient(180deg, rgba(5,12,25,0.95) 0%, rgba(8,35,42,0.9) 20%, rgba(10,50,50,0.85) 35%, rgba(80,50,35,0.7) 55%, rgba(100,60,45,0.75) 70%, rgba(70,30,25,0.85) 85%, rgba(15,8,15,0.97) 100%)";
 
   const glassStyle: React.CSSProperties = {
     background: "rgba(255,255,255,0.08)",
