@@ -1,27 +1,34 @@
 # Meeting: Weekly Founders Sync - Test
 
-**Date:** 2026-04-11T16:55:53.359Z
+**Date:** 2026-04-11T16:59:09.015Z
 **Attendees:** shawn, mark, michael
 
 ## Summary
 
-The founders discussed progress on their insurance business setup, with Shawn having passed his insurance exam enabling them to move forward with carrier appointments. They made key decisions on office space in Coral Springs and selected Medicare Center as their CRM, while assigning specific tasks for appointment paperwork and administrative items.
+The founders discussed next steps following Shawn's successful insurance exam, including carrier appointment paperwork assignments and selecting an 800 sq ft Coral Springs office space for $1,500/month. They also decided on Medicare Center as their CRM solution and addressed outstanding LLC filing fee reimbursement.
 
 ## Tasks
 
-- [ ] S [medium]
+- [ ] Submit Humana appointment paperwork this week (Owner: shawn) [high]
+- [ ] Handle Aetna appointment paperwork by Friday (Owner: mark) [high]
+- [ ] Draft lease review checklist (Owner: michael) [high]
+- [ ] Venmo Michael $250 for LLC filing fees today (Owner: shawn) [high]
 
 ## Decisions
 
-- S [high]
+- Move forward with carrier appointments now that Shawn passed insurance exam [high]
+- Go with the Coral Springs office space - 800 sq ft at $1,500/month [high]
+- Lock in Medicare Center as the CRM solution [high]
 
 ## Ideas
 
-- S
+- Coral Springs office space option - 800 square feet at fifteen hundred per month
+- Use Medicare Center as the CRM platform
+- Create a lease review checklist for the office space process
 
 ## Open Questions
 
-- S
+- No unresolved questions identified - all discussed items reached clear decisions or assigned action items
 
 ## Raw Analysis
 
@@ -39,11 +46,12 @@ The founders discussed progress on their insurance business setup, with Shawn ha
 • Lock in Medicare Center as the CRM solution [high]
 
 ## IDEAS
-• Office space option in Coral Springs identified by Shawn - 800 square feet for $1,500/month
-• Medicare Center CRM recommendation by Michael
+• Coral Springs office space option - 800 square feet at fifteen hundred per month (Shawn) [high]
+• Use Medicare Center as the CRM platform (Michael) [high]
+• Create a lease review checklist for the office space process (Michael) [high]
 
 ## QUESTIONS
-• No unresolved questions identified - all discussed items reached resolution
+• No unresolved questions identified - all discussed items reached clear decisions or assigned action items
 
 ## SUMMARY
-The founders discussed progress on their insurance business setup, with Shawn having passed his insurance exam enabling them to move forward with carrier appointments. They made key decisions on office space in Coral Springs and selected Medicare Center as their CRM, while assigning specific tasks for appointment paperwork and administrative items.
+The founders discussed next steps following Shawn's successful insurance exam, including carrier appointment paperwork assignments and selecting an 800 sq ft Coral Springs office space for $1,500/month. They also decided on Medicare Center as their CRM solution and addressed outstanding LLC filing fee reimbursement.
