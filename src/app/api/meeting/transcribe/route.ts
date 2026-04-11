@@ -66,12 +66,27 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Determine the correct mime type and file extension from the uploaded file
+    const uploadedType = file.type || "audio/webm";
+    const extMap: Record<string, string> = {
+      "audio/webm": "webm",
+      "audio/webm;codecs=opus": "webm",
+      "audio/mp4": "m4a",
+      "audio/ogg": "ogg",
+      "audio/ogg;codecs=opus": "ogg",
+      "audio/wav": "wav",
+      "audio/mpeg": "mp3",
+      "audio/flac": "flac",
+    };
+    const ext = extMap[uploadedType] || "webm";
+    const fileName = `recording.${ext}`;
+
     // Convert file to buffer for Groq API
     const arrayBuffer = await file.arrayBuffer();
 
-    // Create FormData for Groq API
+    // Create FormData for Groq API — preserve original mime type and use proper filename
     const groqFormData = new FormData();
-    groqFormData.append("file", new Blob([arrayBuffer], { type: "audio/wav" }));
+    groqFormData.append("file", new Blob([arrayBuffer], { type: uploadedType }), fileName);
     groqFormData.append("model", "whisper-large-v3-turbo");
     groqFormData.append("response_format", "verbose_json");
 
