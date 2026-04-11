@@ -17,69 +17,85 @@ interface MeetingSummary {
   isBrief: boolean;
 }
 
+// Bullet colors per spec: teal=active, amber=decision, coral=idea, gray=archived
 const wikiSections: WikiSection[] = [
   {
     id: "founders",
     title: "Founders",
     items: [
-      { label: "Shawn", slug: "founders/shawn", color: "bg-[#e0f2f1]" },
-      { label: "Mark", slug: "founders/mark", color: "bg-[#ffebee]" },
-      { label: "Michael", slug: "founders/michael", color: "bg-[#f1f5f3]" },
+      { label: "Shawn", slug: "people/shawn", color: "bg-[#e0f2f1]" },
+      { label: "Mark", slug: "people/mark", color: "bg-[#ffebee]" },
+      { label: "Michael", slug: "people/michael", color: "bg-[#f1f5f3]" },
+    ],
+  },
+  {
+    id: "partners",
+    title: "Active Partners",
+    items: [
+      { label: "Active Partners", slug: "partners/active", color: "bg-[#e0f2f1]" },
     ],
   },
   {
     id: "operations",
-    title: "Operations",
+    title: "Operations & Licensing",
     items: [
-      {
-        label: "Agent Onboarding",
-        slug: "operations/onboarding",
-        color: "bg-[#fff3e0]",
-      },
-      {
-        label: "Licensing Requirements",
-        slug: "operations/licensing",
-        color: "bg-[#f3e5f5]",
-      },
-      { label: "Renewals", slug: "operations/renewals", color: "bg-[#e8f5e9]" },
+      { label: "Agent Onboarding", slug: "operations/onboarding", color: "bg-[#e0f2f1]" },
+      { label: "Licensing Requirements", slug: "operations/licensing", color: "bg-[#e0f2f1]" },
+      { label: "Renewals", slug: "operations/renewals", color: "bg-[#e0f2f1]" },
     ],
   },
   {
     id: "financial",
     title: "Financial Model",
     items: [
-      { label: "Projections", slug: "financial/projections", color: "bg-[#e3f2fd]" },
-      {
-        label: "Compensation",
-        slug: "financial/compensation",
-        color: "bg-[#fce4ec]",
-      },
-      {
-        label: "Break-Even Analysis",
-        slug: "financial/breakeven",
-        color: "bg-[#e0f2f1]",
-      },
+      { label: "Projections", slug: "financials/projections", color: "bg-[#e3f2fd]" },
+      { label: "Compensation", slug: "financials/compensation", color: "bg-[#e3f2fd]" },
+      { label: "Break-Even Analysis", slug: "financials/breakeven", color: "bg-[#e3f2fd]" },
+      { label: "Manifesto v2", slug: "financials/manifesto-v2", color: "bg-[#e3f2fd]" },
+      { label: "Base Scenario", slug: "financials/base-scenario", color: "bg-[#e3f2fd]" },
+      { label: "Founder P&L", slug: "financials/founder-pnl", color: "bg-[#e3f2fd]" },
+    ],
+  },
+  {
+    id: "decisions",
+    title: "Recent Decisions",
+    items: [
+      { label: "Group Table", slug: "group-table", color: "bg-[#fffbeb]" },
     ],
   },
   {
     id: "ideas",
-    title: "Ideas",
+    title: "Ideas & Brainstorms",
     items: [
-      {
-        label: "Product Expansion",
-        slug: "ideas/expansion",
-        color: "bg-[#f1f5f3]",
-      },
-      {
-        label: "Technology Wishlist",
-        slug: "ideas/tech",
-        color: "bg-[#fff3e0]",
-      },
-      {
-        label: "Market Opportunities",
-        slug: "ideas/market",
-        color: "bg-[#f3e5f5]",
-      },
+      { label: "Product Expansion", slug: "ideas/expansion", color: "bg-[#fce4ec]" },
+      { label: "Technology Wishlist", slug: "ideas/tech", color: "bg-[#fce4ec]" },
+      { label: "Market Opportunities", slug: "ideas/market", color: "bg-[#fce4ec]" },
+    ],
+  },
+  {
+    id: "tracking",
+    title: "Tracking",
+    items: [
+      { label: "Tasks", slug: "tasks", color: "bg-[#e0f2f1]" },
+      { label: "Radar", slug: "radar", color: "bg-[#fffbeb]" },
+      { label: "Reimbursements", slug: "reimbursements", color: "bg-[#fff3e0]" },
+      { label: "Expenses", slug: "expenses", color: "bg-[#fff3e0]" },
+      { label: "Parked Intentions", slug: "parked-intentions", color: "bg-[#f1f5f3]" },
+    ],
+  },
+  {
+    id: "reference",
+    title: "Reference",
+    items: [
+      { label: "State of the Business", slug: "state", color: "bg-[#e0f2f1]" },
+      { label: "Tools", slug: "tools", color: "bg-[#e3f2fd]" },
+    ],
+  },
+  {
+    id: "archived",
+    title: "Archived",
+    items: [
+      { label: "Archived Partners", slug: "partners/archived", color: "bg-[#f5f5f5]" },
     ],
   },
 ];
@@ -283,7 +299,12 @@ export default function WikiPage() {
                       className={`block p-4 rounded-lg border border-[#eae4da] ${item.color} hover:border-[#2b8a88] transition-all hover:shadow-md`}
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-2 h-6 rounded-full bg-[#2b8a88]" />
+                        <div className={`w-2 h-6 rounded-full ${
+                          section.id === "decisions" ? "bg-[#e8a33d]" :
+                          section.id === "ideas" ? "bg-[#e85d4e]" :
+                          section.id === "archived" ? "bg-[#8a8580]" :
+                          "bg-[#2b8a88]"
+                        }`} />
                         <span className="font-medium text-[#1a1a1a]">
                           {item.label}
                         </span>

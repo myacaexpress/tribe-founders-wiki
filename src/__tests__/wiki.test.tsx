@@ -56,23 +56,42 @@ describe("Wiki page", () => {
     ).toBeInTheDocument();
   });
 
-  it("renders all four wiki sections as headings", () => {
+  it("renders all wiki sections as headings", () => {
     // These appear both in TOC and as section headings, so use getAllByText
     expect(screen.getAllByText("Founders").length).toBeGreaterThanOrEqual(2);
-    expect(screen.getAllByText("Operations").length).toBeGreaterThanOrEqual(2);
+    expect(screen.getAllByText("Active Partners").length).toBeGreaterThanOrEqual(2);
+    expect(screen.getAllByText("Operations & Licensing").length).toBeGreaterThanOrEqual(2);
     expect(screen.getAllByText("Financial Model").length).toBeGreaterThanOrEqual(2);
-    expect(screen.getAllByText("Ideas").length).toBeGreaterThanOrEqual(2);
+    expect(screen.getAllByText("Recent Decisions").length).toBeGreaterThanOrEqual(2);
+    expect(screen.getAllByText("Ideas & Brainstorms").length).toBeGreaterThanOrEqual(2);
+    expect(screen.getAllByText("Tracking").length).toBeGreaterThanOrEqual(2);
+    expect(screen.getAllByText("Reference").length).toBeGreaterThanOrEqual(2);
+    expect(screen.getAllByText("Archived").length).toBeGreaterThanOrEqual(2);
   });
 
   it("renders founder wiki links", () => {
     const shawnLink = screen.getByText("Shawn").closest("a");
-    expect(shawnLink).toHaveAttribute("href", "/wiki/founders/shawn");
+    expect(shawnLink).toHaveAttribute("href", "/wiki/people/shawn");
 
     const markLink = screen.getByText("Mark").closest("a");
-    expect(markLink).toHaveAttribute("href", "/wiki/founders/mark");
+    expect(markLink).toHaveAttribute("href", "/wiki/people/mark");
 
     const michaelLink = screen.getByText("Michael").closest("a");
-    expect(michaelLink).toHaveAttribute("href", "/wiki/founders/michael");
+    expect(michaelLink).toHaveAttribute("href", "/wiki/people/michael");
+  });
+
+  it("renders tracking pages", () => {
+    expect(screen.getByText("Tasks")).toBeInTheDocument();
+    expect(screen.getByText("Radar")).toBeInTheDocument();
+    expect(screen.getByText("Reimbursements")).toBeInTheDocument();
+    expect(screen.getByText("Expenses")).toBeInTheDocument();
+    expect(screen.getByText("Parked Intentions")).toBeInTheDocument();
+  });
+
+  it("renders decision and reference sections", () => {
+    expect(screen.getByText("Group Table")).toBeInTheDocument();
+    expect(screen.getByText("State of the Business")).toBeInTheDocument();
+    expect(screen.getByText("Tools")).toBeInTheDocument();
   });
 
   it("filters results when searching", async () => {
