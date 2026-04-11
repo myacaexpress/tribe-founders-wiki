@@ -62,6 +62,9 @@ export default function MeetingPage() {
   const timerIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const animationFrameRef = useRef<number | null>(null);
   const isRecordingRef = useRef(false); // avoid closure issues in animation loop
+  const autoStopTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const MAX_RECORDING_MS = 2.5 * 60 * 60 * 1000; // 2.5 hours
 
   // Waveform visualization
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -122,6 +125,14 @@ export default function MeetingPage() {
         setRecordingTime((prev) => prev + 1);
       }, 1000);
 
+      // Auto-stop after 2.5 hours in case someone forgets
+      autoStopTimeoutRef.current = setTimeout(() => {
+        console.log("[Recording] Auto-stopping after 2.5 hours");
+        if (isRecordingRef.current && mediaRecorderRef.current) {
+          stopRecording();
+        }
+      }, MAX_RECORDING_MS);
+
       // Start visualization after React re-renders the canvas (isRecordingRef avoids closure bug)
       setTimeout(() => {
         const visualize = () => {
@@ -178,6 +189,10 @@ export default function MeetingPage() {
         if (animationFrameRef.current) {
           cancelAnimationFrame(animationFrameRef.current);
           animationFrameRef.current = null;
+        }
+        if (autoStopTimeoutRef.current) {
+          clearTimeout(autoStopTimeoutRef.current);
+          autoStopTimeoutRef.current = null;
         }
 
         const stream = mediaRecorderRef.current!.stream;
