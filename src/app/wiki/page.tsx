@@ -1,12 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 
 interface WikiSection {
   id: string;
   title: string;
   items: { label: string; slug: string; color: string }[];
+}
+
+interface MeetingSummary {
+  name: string;
+  path: string;
+  date: string;
+  title: string;
+  isBrief: boolean;
 }
 
 const wikiSections: WikiSection[] = [
@@ -78,6 +86,41 @@ const wikiSections: WikiSection[] = [
 
 export default function WikiPage() {
   const [search, setSearch] = useState("");
+  const [meetings, setMeetings] = useState<MeetingSummary[]>([]);
+  const [meetingsLoading, setMeetingsLoading] = useState(true);
+  const [expandedMeeting, setExpandedMeeting] = useState<string | null>(null);
+  const [meetingContent, setMeetingContent] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    fetch("/api/meeting/list")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.meetings) setMeetings(data.meetings);
+      })
+      .catch(() => {})
+      .finally(() => setMeetingsLoading(false));
+  }, []);
+
+  const loadMeetingContent = async (path: string) => {
+    if (meetingContent[path]) {
+      setExpandedMeeting(expandedMeeting === path ? null : path);
+      return;
+    }
+    try {
+      const res = await fetch(`/api/meeting/view?file=${encodeURIComponent(path)}`);
+      const data = await res.json();
+      if (data.content) {
+        setMeetingContent((prev) => ({ ...prev, [path]: data.content }));
+        setExpandedMeeting(path);
+      }
+    } catch {}
+  };
+
+  const filteredMeetings = meetings.filter(
+    (m) =>
+      m.title.toLowerCase().includes(search.toLowerCase()) ||
+      m.date.includes(search)
+  );
 
   const filteredSections = wikiSections.map((section) => ({
     ...section,
@@ -140,6 +183,14 @@ export default function WikiPage() {
             Contents
           </h2>
           <ul className="space-y-2 text-sm">
+            <li>
+              <a
+                href="#meetings"
+                className="text-[#2b8a88] hover:text-[#1a5554] transition-colors"
+              >
+                Meetings
+              </a>
+            </li>
             {wikiSections.map((section) => (
               <li key={section.id}>
                 <a
@@ -151,6 +202,65 @@ export default function WikiPage() {
               </li>
             ))}
           </ul>
+        </div>
+
+        {/* Meetings Section */}
+        <div id="meetings" className="mb-8">
+          <h2 className="serif-heading text-xl mb-4 text-[#1a1a1a]">
+            Meetings
+          </h2>
+          {meetingsLoading ? (
+            <div className="card text-center py-8">
+              <p className="text-[#8a8580]">Loading meetings...</p>
+            </div>
+          ) : filteredMeetings.length === 0 ? (
+            <div className="card text-center py-8">
+              <p className="text-[#8a8580]">
+                {search ? `No meetings match "${search}"` : "No meeting notes yet"}
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {filteredMeetings.map((meeting) => (
+                <div key={meeting.path}>
+                  <button
+                    onClick={() => loadMeetingContent(meeting.path)}
+                    className={`w-full text-left p-4 rounded-lg border transition-all hover:shadow-md ${
+                      meeting.isBrief
+                        ? "border-[#f59e0b] bg-[#fffbeb] hover:border-[#d97706]"
+                        : "border-[#eae4da] bg-[#e0f2f1] hover:border-[#2b8a88]"
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div
+                        className={`w-2 h-6 rounded-full ${
+                          meeting.isBrief ? "bg-[#f59e0b]" : "bg-[#2b8a88]"
+                        }`}
+                      />
+                      <div className="flex-1">
+                        <span className="font-medium text-[#1a1a1a]">
+                          {meeting.title}
+                        </span>
+                        <span className="ml-3 text-xs text-[#8a8580]">
+                          {meeting.date}
+                        </span>
+                      </div>
+                      <span className="text-[#8a8580] text-sm">
+                        {expandedMeeting === meeting.path ? "▲" : "▼"}
+                      </span>
+                    </div>
+                  </button>
+                  {expandedMeeting === meeting.path && meetingContent[meeting.path] && (
+                    <div className="mt-2 p-4 rounded-lg border border-[#eae4da] bg-white">
+                      <pre className="whitespace-pre-wrap text-sm text-[#1a1a1a] font-sans leading-relaxed">
+                        {meetingContent[meeting.path]}
+                      </pre>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Wiki Sections */}

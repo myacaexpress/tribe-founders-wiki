@@ -23,7 +23,17 @@ jest.mock("next/link", () => {
 
 describe("Wiki page", () => {
   beforeEach(() => {
+    // Mock fetch for the meetings list API call
+    global.fetch = jest.fn(() =>
+      Promise.resolve({
+        json: () => Promise.resolve({ meetings: [] }),
+      })
+    ) as jest.Mock;
     render(<WikiPage />);
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
   });
 
   it("renders the Wiki heading", () => {
