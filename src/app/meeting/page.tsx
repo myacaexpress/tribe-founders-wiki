@@ -531,7 +531,7 @@ export default function MeetingPage() {
             <span style={{ color: "#ff6b5a" }}>Be</span>
           </div>
           <div style={{ fontSize: 11, letterSpacing: 3, textTransform: "uppercase", color: "rgba(255,255,255,0.5)", marginTop: 6 }}>
-            Founders — Florida
+            Trifecta Founders
           </div>
         </div>
         <div style={{ marginBottom: 32 }}>
