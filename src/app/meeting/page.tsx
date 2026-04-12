@@ -306,40 +306,12 @@ export default function MeetingPage() {
     // Start recording first (microphone access)
     await startRecording();
 
-    // Then create a Google Meet link and email founders
+    // Email selected founders with a pre-filled invite
     const selectedEmails = Object.entries(attendees)
       .filter(([, selected]) => selected)
       .map(([key]) => FOUNDER_EMAILS[key])
       .filter(Boolean);
 
-    try {
-      const res = await fetch("/api/meeting/create-meet", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title: meetingTitle || "Founders Meeting",
-          attendees: selectedEmails,
-        }),
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        if (data.meetLink) {
-          setMeetUrl(data.meetLink);
-          // Open Meet automatically
-          window.open(data.meetLink, "_blank");
-          return;
-        }
-      }
-    } catch (e) {
-      console.log("[Meeting] Calendar API unavailable, using fallback");
-    }
-
-    // Fallback: open a new Google Meet and send email invite manually
-    const meetLink = "https://meet.google.com/new";
-    window.open(meetLink, "_blank");
-
-    // Send email invite via mailto with all founder emails
     if (selectedEmails.length > 0) {
       const title = meetingTitle || "Founders Meeting";
       const subject = encodeURIComponent(`Join: ${title}`);
@@ -347,7 +319,7 @@ export default function MeetingPage() {
         `Hey team,\n\nJoining a TriBe founders meeting now.\n\nI'll paste the Google Meet link once I'm in.\n\n— Sent from TriBe`
       );
       const to = selectedEmails.join(",");
-      window.open(`mailto:${to}?subject=${subject}&body=${body}`, "_self");
+      window.location.href = `mailto:${to}?subject=${subject}&body=${body}`;
     }
   };
 
@@ -654,7 +626,7 @@ export default function MeetingPage() {
                 Start Meeting
               </button>
               <div style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", textAlign: "center", marginTop: -4 }}>
-                Opens Google Meet and begins recording
+                Starts recording + opens email invite to founders
               </div>
               <button onClick={generateBrief} style={{ ...btnGhost, color: "rgba(255,255,255,0.5)", fontSize: 14 }}>
                 Generate Pre-Meeting Brief
@@ -733,6 +705,14 @@ export default function MeetingPage() {
                 </>
               ) : (
                 <>
+                  <a
+                    href="https://meet.google.com/new"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ display: "block", width: "100%", padding: "14px 24px", borderRadius: 50, fontSize: 15, fontWeight: 700, background: "linear-gradient(135deg, #4285f4, #34a853)", color: "#fff", border: "none", textAlign: "center", textDecoration: "none", boxSizing: "border-box", marginBottom: 12 }}
+                  >
+                    Open Google Meet
+                  </a>
                   <div style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", textAlign: "center", marginBottom: 10 }}>
                     Paste your Meet link once you&apos;re in the call
                   </div>
