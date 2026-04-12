@@ -1,6 +1,6 @@
 # Pre-Meeting Brief: Founders Sync
 **Date:** 2026-04-12
-**Generated:** 2026-04-12T18:50:04.461Z
+**Generated:** 2026-04-12T20:50:48.333Z
 
 ## Radar Items
 
@@ -34,5 +34,6 @@
 
 ## Recent Meetings
 
+- Pre-Meeting Brief: Founders Sync
 - Meeting: Weekly Founders Sync - Test
 - Pre-Meeting Brief: test 1
