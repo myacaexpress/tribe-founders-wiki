@@ -39,37 +39,32 @@ const wikiSections: WikiSection[] = [
     id: "operations",
     title: "Operations & Licensing",
     items: [
-      { label: "Agent Onboarding", slug: "operations/onboarding", color: "bg-[#e0f2f1]" },
+      { label: "Pod Launch", slug: "operations/pod-launch", color: "bg-[#e0f2f1]" },
       { label: "Licensing Requirements", slug: "operations/licensing", color: "bg-[#e0f2f1]" },
-      { label: "Renewals", slug: "operations/renewals", color: "bg-[#e0f2f1]" },
+      { label: "Tech Stack", slug: "operations/tech-stack", color: "bg-[#e0f2f1]" },
     ],
   },
   {
     id: "financial",
     title: "Financial Model",
     items: [
-      { label: "Projections", slug: "financials/projections", color: "bg-[#e3f2fd]" },
-      { label: "Compensation", slug: "financials/compensation", color: "bg-[#e3f2fd]" },
-      { label: "Break-Even Analysis", slug: "financials/breakeven", color: "bg-[#e3f2fd]" },
-      { label: "Manifesto v2", slug: "financials/manifesto-v2", color: "bg-[#e3f2fd]" },
       { label: "Base Scenario", slug: "financials/base-scenario", color: "bg-[#e3f2fd]" },
       { label: "Founder P&L", slug: "financials/founder-pnl", color: "bg-[#e3f2fd]" },
+      { label: "Manifesto v2", slug: "financials/manifesto-v2", color: "bg-[#e3f2fd]" },
     ],
   },
   {
     id: "decisions",
     title: "Recent Decisions",
     items: [
-      { label: "Group Table", slug: "group-table", color: "bg-[#fffbeb]" },
+      { label: "Group Table", slug: "group-table/index", color: "bg-[#fffbeb]" },
     ],
   },
   {
     id: "ideas",
     title: "Ideas & Brainstorms",
     items: [
-      { label: "Product Expansion", slug: "ideas/expansion", color: "bg-[#fce4ec]" },
-      { label: "Technology Wishlist", slug: "ideas/tech", color: "bg-[#fce4ec]" },
-      { label: "Market Opportunities", slug: "ideas/market", color: "bg-[#fce4ec]" },
+      { label: "Seedlings", slug: "ideas/seedlings", color: "bg-[#fce4ec]" },
     ],
   },
   {

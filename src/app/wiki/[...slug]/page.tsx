@@ -30,8 +30,19 @@ async function getMarkdownContent(
       notFound();
     }
 
+    // Try the direct path, then fall back to index.md inside a folder
+    let finalPath = resolvedPath;
+    if (!fs.existsSync(resolvedPath)) {
+      const indexPath = resolvedPath.replace(/\.md$/, "/index.md");
+      if (fs.existsSync(indexPath)) {
+        finalPath = indexPath;
+      } else {
+        notFound();
+      }
+    }
+
     // Read file
-    const fileContent = fs.readFileSync(resolvedPath, "utf-8");
+    const fileContent = fs.readFileSync(finalPath, "utf-8");
 
     // Extract title from first H1 or use slug
     const titleMatch = fileContent.match(/^#\s+(.+)$/m);

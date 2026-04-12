@@ -65,6 +65,8 @@ export default function HomeClient({
   businessStateSentence,
 }: HomeClientProps) {
   const [activeTab, setActiveTab] = useState<"todo" | "done">("todo");
+  const [showMeetShare, setShowMeetShare] = useState(false);
+  const [meetUrl, setMeetUrl] = useState("https://meet.google.com/new");
 
   const todoItems = taskItems.filter((t) => !t.done);
   const doneItems = taskItems.filter((t) => t.done);
@@ -89,7 +91,7 @@ export default function HomeClient({
   };
 
   return (
-    <div style={{ position: "relative", minHeight: "100vh", overflowX: "hidden" }}>
+    <div style={{ position: "relative", minHeight: "100vh" }}>
 
       {/* Fixed scenic background */}
       <div style={{
@@ -123,27 +125,64 @@ export default function HomeClient({
         </div>
 
         {/* Action buttons */}
-        <div style={{ display: "flex", gap: 8, overflowX: "auto", padding: "4px 0", marginBottom: 16, scrollbarWidth: "none" }}>
-          <Link
-            href="/meeting"
-            style={{ flexShrink: 0, padding: "10px 20px", borderRadius: 50, fontSize: 14, fontWeight: 600, background: "linear-gradient(135deg, #00c9a7, #00b4d8)", color: "#fff", textDecoration: "none", whiteSpace: "nowrap", boxShadow: "0 4px 15px rgba(0,201,167,0.3)" }}
-          >
-            Meet
-          </Link>
-          {[
-            { href: "/watchers", label: "Watchers" },
-            { href: "/search",   label: "Search" },
-            { href: "/wiki",     label: "Full Wiki" },
-          ].map(({ href, label }) => (
-            <Link
-              key={href}
-              href={href}
-              style={{ flexShrink: 0, padding: "10px 20px", borderRadius: 50, fontSize: 14, fontWeight: 600, background: "rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.1)", textDecoration: "none", whiteSpace: "nowrap" }}
+        <div style={{ overflowX: "auto", WebkitOverflowScrolling: "touch" as never, marginBottom: 16, marginLeft: -20, marginRight: -20, paddingLeft: 20, paddingRight: 20 } as React.CSSProperties}>
+          <div style={{ display: "flex", gap: 8, paddingTop: 4, paddingBottom: 8, width: "max-content" }}>
+            <button
+              onClick={() => {
+                window.open("https://meet.google.com/new", "_blank", "noopener,noreferrer");
+                setShowMeetShare(true);
+              }}
+              style={{ flexShrink: 0, padding: "10px 20px", borderRadius: 50, fontSize: 14, fontWeight: 600, background: "linear-gradient(135deg, #00c9a7, #00b4d8)", color: "#fff", border: "none", whiteSpace: "nowrap", boxShadow: "0 4px 15px rgba(0,201,167,0.3)", cursor: "pointer" }}
             >
-              {label}
-            </Link>
-          ))}
+              Meet
+            </button>
+            {[
+              { href: "/meeting",  label: "Record" },
+              { href: "/watchers", label: "Watchers" },
+              { href: "/search",   label: "Search" },
+              { href: "/wiki",     label: "Full Wiki" },
+            ].map(({ href, label }) => (
+              <Link
+                key={href}
+                href={href}
+                style={{ flexShrink: 0, padding: "10px 20px", borderRadius: 50, fontSize: 14, fontWeight: 600, background: "rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.1)", textDecoration: "none", whiteSpace: "nowrap" }}
+              >
+                {label}
+              </Link>
+            ))}
+          </div>
         </div>
+
+        {/* Meet share panel */}
+        {showMeetShare && (
+          <div style={{ ...glass, marginBottom: 16, padding: "16px 20px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+              <span style={{ fontSize: 14, fontWeight: 600, color: "#fff" }}>Share Meeting Link</span>
+              <button onClick={() => setShowMeetShare(false)} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.5)", fontSize: 18, cursor: "pointer", padding: 0, lineHeight: 1 }}>×</button>
+            </div>
+            <input
+              type="text"
+              value={meetUrl}
+              onChange={(e) => setMeetUrl(e.target.value)}
+              placeholder="Paste your Meet URL here"
+              style={{ width: "100%", padding: "8px 12px", borderRadius: 10, fontSize: 13, background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.2)", color: "#fff", outline: "none", boxSizing: "border-box", marginBottom: 10 }}
+            />
+            <div style={{ display: "flex", gap: 8 }}>
+              <a
+                href={`sms:?body=${encodeURIComponent(`Join our meeting: ${meetUrl}`)}`}
+                style={{ flex: 1, textAlign: "center", padding: "9px 12px", borderRadius: 10, fontSize: 13, fontWeight: 600, background: "rgba(0,201,167,0.15)", color: "#00c9a7", border: "1px solid rgba(0,201,167,0.3)", textDecoration: "none", whiteSpace: "nowrap" }}
+              >
+                iMessage
+              </a>
+              <a
+                href={`mailto:?subject=${encodeURIComponent("Meeting Link")}&body=${encodeURIComponent(`Join our meeting: ${meetUrl}`)}`}
+                style={{ flex: 1, textAlign: "center", padding: "9px 12px", borderRadius: 10, fontSize: 13, fontWeight: 600, background: "rgba(180,212,255,0.1)", color: "#7dd3fc", border: "1px solid rgba(125,211,252,0.3)", textDecoration: "none", whiteSpace: "nowrap" }}
+              >
+                Email
+              </a>
+            </div>
+          </div>
+        )}
 
         {/* Radar */}
         <div style={glass}>
